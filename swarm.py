@@ -63,14 +63,14 @@ if __name__ == '__main__':
     # Parse command line options.
     input_file, threshold = option_parse()
 
-    # Build a list of sequences and initialize lists
+    # Build a list of sequences and count ACGT occurences
     input_format = "fasta"
     records_list = list()
     status = list()
     distances = list()
     with open(input_file, "rU") as input_file:
         records = SeqIO.parse(input_file, input_format)
-        records_list = [(record.id.split("_")[0], record.id.split("_")[1], len(record.seq), str(record.seq)) for record in records]
+        records_list = [(record.id.split("_")[0], record.id.split("_")[1], len(record.seq), str(record.seq), [record.seq.count(nuc) for nuc in ("a","c","g","t")]) for record in records]
         status = [True for i in xrange(len(records_list))]
 
     # Start swarming
@@ -120,12 +120,13 @@ if __name__ == '__main__':
                     # hand" reads. Do not treat already assigned
                     # sequences. Do not compare sequences we know to
                     # be too distant. Do not compare sequences with a
-                    # length difference greater than the threshold.
+                    # length difference greater than the threshold. Do not compare sequences if their nucleotide profile 
                     # Keep if its below the threshold.
                     hits = [j for j, d in candidates
                             if status[j] is True
                             and d <= frontier
                             and abs((records_list[l][2] - records_list[j][2])) <= threshold
+                            and sum([abs(cmp(couple[0], couple[1])) for couple in zip(records_list[l][4], records_list[j][4])]) <= 2 * threshold
                             and distance(records_list[l][3], records_list[j][3]) <= threshold]
                     nextseeds.extend(hits)
                     swarm.extend([records_list[j][0] for j in hits])
