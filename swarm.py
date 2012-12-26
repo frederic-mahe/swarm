@@ -9,7 +9,7 @@ from __future__ import print_function
 
 __author__ = "Frédéric Mahé <frederic.mahe@sb-roscoff.fr>"
 __date__ = "2012/05/14"
-__version__ = "$Revision: 1.0"
+__version__ = "$Revision: 2.0"
 
 import sys
 from editdist import distance
@@ -38,7 +38,7 @@ def option_parse():
         metavar = "<FILENAME>",
         action = "store",
         dest = "input_file",
-        help = "set <FILENAME> as input file. Ungapped fasta file.")
+        help = "set <FILENAME> as input file. Ungapped lowercase fasta file (acgt only).")
 
     parser.add_option("-t", "--threshold",
         metavar = "<THRESHOLD>",
@@ -63,7 +63,7 @@ if __name__ == '__main__':
     # Parse command line options.
     input_file, threshold = option_parse()
 
-    # Build a list of sequences and count ACGT occurences
+    # Build a list of sequences and count nucleotide occurences
     input_format = "fasta"
     records_list = list()
     status = list()
@@ -120,8 +120,9 @@ if __name__ == '__main__':
                     # hand" reads. Do not treat already assigned
                     # sequences. Do not compare sequences we know to
                     # be too distant. Do not compare sequences with a
-                    # length difference greater than the threshold. Do not compare sequences if their nucleotide profile 
-                    # Keep if its below the threshold.
+                    # length difference greater than the threshold. Do
+                    # not compare sequences if their nucleotide
+                    # profile Keep if its below the threshold.
                     hits = [j for j, d in candidates
                             if status[j] is True
                             and d <= frontier
@@ -145,22 +146,10 @@ if __name__ == '__main__':
         
 sys.exit(0)
 
-# Notes
+# Profiling
+# ---------
 #
-# Profiling (python -m cProfile swarm.py -i file.fas > tmp)
-# shows that more than 80% of the computing time is spent on
-# editdist.distance. If I want to accelerate the algorithm, I only
-# have two options:
-#
-# - use a faster distance function (80 µs/comparison),
-# - reduce the number of sequence comparisons.
-#
-# I don't know how to do that yet. The improvement possibilities in
-# the python part are now close to zero.
-# 
-# - should I use arrays: NO
-# - I use tuples and tuples of # tuples when possible (less memory, faster handling)
-# - Comparing length may be a waste of time: NO
+# python -m cProfile swarm.py -i file.fas > tmp
 #
 # Expected results
 # ----------------
