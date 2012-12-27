@@ -7,8 +7,8 @@
 
 from __future__ import print_function
 
-__author__ = "Frédéric Mahé <frederic.mahe@sb-roscoff.fr>"
-__date__ = "2012/05/14"
+__author__ = "Frédéric Mahé <mahe@rhrk.uni-kl.fr>"
+__date__ = "2012/12/27"
 __version__ = "$Revision: 2.0"
 
 import sys
@@ -106,8 +106,7 @@ if __name__ == '__main__':
         # Parse candidates and select sons
         firstseeds = [j for j, d in candidates if d <= threshold]
         swarm.extend([records_list[j][0] for j in firstseeds])
-        for j in firstseeds:
-            status[j] = False
+        for j in firstseeds: status[j] = False
 
         # Loop other the first subseeds (if they exists)
         all_subseeds = list()
@@ -125,20 +124,20 @@ if __name__ == '__main__':
                     # Candidates already have been filtered for "left
                     # hand" reads. Do not treat already assigned
                     # sequences. Do not compare sequences we know to
-                    # be too distant. Do not compare sequences with a
-                    # length difference greater than the threshold. Do
-                    # not compare sequences if their nucleotide
-                    # profile Keep if its below the threshold.
+                    # be too distant from the seed. Do not compare
+                    # sequences with a length difference greater than
+                    # the threshold. Do not compare sequences if their
+                    # nucleotide profiles are too divergent.
                     hits = [j for j, d in candidates
                             if status[j] is True
                             and d <= frontier
-                            and abs((records_list[l][2] - records_list[j][2])) <= threshold
+                            and abs(cmp(records_list[l][2], records_list[j][2])) <= threshold
                             and sum([abs(cmp(couple[0], couple[1])) for couple in zip(records_list[l][4], records_list[j][4])]) <= 2 * threshold - abs(cmp(records_list[l][2], records_list[j][2]))
                             and distance(records_list[l][3], records_list[j][3]) <= threshold]
-                    nextseeds.extend(hits)
-                    swarm.extend([records_list[j][0] for j in hits])
-                    for j in hits:
-                        status[j] = False
+                    if hits:
+                        nextseeds.extend(hits)
+                        swarm.extend([records_list[j][0] for j in hits])
+                        for j in hits: status[j] = False
                 # Stop condition
                 if nextseeds:
                     all_subseeds.append(nextseeds)
