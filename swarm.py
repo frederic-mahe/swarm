@@ -133,7 +133,7 @@ if __name__ == '__main__':
                             if status[j] is True
                             and d <= frontier
                             and abs((records_list[l][2] - records_list[j][2])) <= threshold
-                            and sum([abs(cmp(couple[0], couple[1])) for couple in zip(records_list[l][4], records_list[j][4])]) <= 2 * threshold
+                            and sum([abs(cmp(couple[0], couple[1])) for couple in zip(records_list[l][4], records_list[j][4])]) <= 2 * threshold - abs(cmp(records_list[l][2], records_list[j][2]))
                             and distance(records_list[l][3], records_list[j][3]) <= threshold]
                     nextseeds.extend(hits)
                     swarm.extend([records_list[j][0] for j in hits])
