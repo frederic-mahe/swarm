@@ -65,13 +65,19 @@ if __name__ == '__main__':
 
     # Build a list of sequences and count nucleotide occurences
     input_format = "fasta"
+    nucleotides = ("a","c","g","t")
     records_list = list()
     status = list()
     distances = list()
     with open(input_file, "rU") as input_file:
         records = SeqIO.parse(input_file, input_format)
-        records_list = [(record.id.split("_")[0], record.id.split("_")[1], len(record.seq), str(record.seq), [record.seq.count(nuc) for nuc in ("a","c","g","t")]) for record in records]
-        status = [True for i in xrange(len(records_list))]
+        records_list = [(record.id.split("_")[0],
+                         record.id.split("_")[1],
+                         len(record.seq),
+                         str(record.seq),
+                         [record.seq.lower().count(n) for n in nucleotides])
+                        for record in records]
+        status = [True] * len(records_list)
 
     # Start swarming
     while True:
