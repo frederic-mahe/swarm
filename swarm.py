@@ -68,7 +68,7 @@ def needleman_wunsch(seqA, seqB):
          't': {'a': 3, 'g': 3, 'c': 3, 't': 0}}
 
     # Initialize array F with zeroes (and set outer lines and columns
-    # with penalty value)
+    # with cumulative penalty value)
     A = seqA
     B = seqB
     I = range(len(A) + 1)
@@ -128,6 +128,14 @@ def needleman_wunsch(seqA, seqB):
         AlignmentA.append("-")
         AlignmentB.append(B[j-1])
         j -= 1
+    # Pythonic way?
+    # if i:
+    #     AlignmentA.append(A[i-1:len(i)])
+    #     AlignmentB.append("-" * i)
+    # if j:
+    #     AlignmentA.append("-" * j)
+    #     AlignmentB.append(B[j-1:len(j)])
+        
 
     ## Similarity or Dissimilarity (reverse and convert back the lists
     # to strings)
