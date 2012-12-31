@@ -166,7 +166,8 @@ def needleman_wunsch(seqA, seqB):
 
     # similarity = 100.0 * matches / len0
     # dissimilarity = 100.0 * mismatches / len0
-    
+    print(mismatches, file=sys.stderr)
+
     # return score
     return mismatches
 
@@ -196,7 +197,7 @@ if __name__ == '__main__':
                          [record.seq.lower().count(n) for n in nucleotides])
                         for record in records]
         status = [True] * len(records_list)
-
+        
     # Start swarming
     while True:
         try:
@@ -233,11 +234,11 @@ if __name__ == '__main__':
             # Loop other the list of firstseeds lists
             for k, subseeds in enumerate(all_subseeds):
                 nextseeds = list()
-                frontier = (2 + k) * threshold
+                frontier = (k + 2) * threshold
                 # I could replace that for loop with a list
                 # comprehension, but the risk is to perform un-needed
                 # amplicon comparisons, as the status list is not
-                # updated regularly .
+                # updated regularly.
                 for l in subseeds:
                     # Candidates already have been filtered for "left
                     # hand" reads. Do not treat already assigned
@@ -246,12 +247,20 @@ if __name__ == '__main__':
                     # sequences with a length difference greater than
                     # the threshold. Do not compare sequences if their
                     # nucleotide profiles are too divergent.
-                    hits = [j for j, d in candidates
-                            if status[j] is True
-                            and d <= frontier
-                            and abs(cmp(records_list[l][2], records_list[j][2])) <= threshold
-                            and sum([abs(cmp(couple[0], couple[1])) for couple in zip(records_list[l][4], records_list[j][4])]) <= 2 * threshold - abs(cmp(records_list[l][2], records_list[j][2]))
-                            and needleman_wunsch(records_list[l][3], records_list[j][3]) <= threshold]
+                    hits = list()
+                    for j, d in candidates:
+                        if status[j] is True:
+                            if d <= frontier:
+                                if abs(cmp(records_list[l][2], records_list[j][2])) <= threshold:
+                                    if sum([abs(cmp(couple[0], couple[1])) for couple in zip(records_list[l][4], records_list[j][4])]) <= 2 * threshold - abs(cmp(records_list[l][2], records_list[j][2])):
+                                        if needleman_wunsch(records_list[l][3], records_list[j][3]) <= threshold:
+                                            hits.append(j)
+                    # hits = [j for j, d in candidates
+                    #         if status[j] is True
+                    #         and d <= frontier
+                    #         and abs(cmp(records_list[l][2], records_list[j][2])) <= threshold
+                    #         and sum([abs(cmp(couple[0], couple[1])) for couple in zip(records_list[l][4], records_list[j][4])]) <= 2 * threshold - abs(cmp(records_list[l][2], records_list[j][2]))
+                    #         and needleman_wunsch(records_list[l][3], records_list[j][3]) <= threshold]
                     if hits:
                         nextseeds.extend(hits)
                         swarm.extend([records_list[j][0] for j in hits])
