@@ -88,88 +88,8 @@ def needleman_wunsch(seqA, seqB):
             # Use max() for a similarity matrix 
             F[i][j] = min(match, insert, delete)
 
-    ## Traceback
-    #
-    # The algorithm progresses backward. Appending to a string or to
-    # the begining of a list is slow. Use a list instead of a string,
-    # reverse the list and convert it back to a string at the end.
-    AlignmentA = list()
-    AlignmentB = list()
-    i = len(A)
-    j = len(B)
-
-    while i > 0 and j > 0:
-        Score = F[i][j]
-        ScoreDiag = F[i - 1][j - 1]
-        ScoreUp = F[i][j - 1]
-        ScoreLeft = F[i - 1][j]
-        if Score == ScoreDiag + S[A[i-1]][B[j-1]]:
-            AlignmentA.append(A[i-1])
-            AlignmentB.append(B[j-1])
-            i -= 1
-            j -= 1
-        elif Score == ScoreLeft + d:
-            AlignmentA.append(A[i-1])
-            AlignmentB.append("-")
-            i -= 1
-        elif Score == ScoreUp + d:
-            AlignmentA.append("-")
-            AlignmentB.append(B[j-1])
-            j -= 1
-        else:
-            print("Something went really bad!", A, B, sep="\n", file=sys.stderr)
-            sys.exit(-1)
-    # Deal with overhanging 5' parts.
-    while i:
-        AlignmentA.append(A[i-1])
-        AlignmentB.append("-")
-        i -= 1
-    while j:
-        AlignmentA.append("-")
-        AlignmentB.append(B[j-1])
-        j -= 1
-    # Pythonic way?
-    # if i:
-    #     AlignmentA.append(A[i-1:len(i)])
-    #     AlignmentB.append("-" * i)
-    # if j:
-    #     AlignmentA.append("-" * j)
-    #     AlignmentB.append(B[j-1:len(j)])
-        
-
-    ## Similarity or Dissimilarity (reverse and convert back the lists
-    # to strings)
-    AlignmentA = "".join(AlignmentA[::-1])
-    AlignmentB = "".join(AlignmentB[::-1])
-    lenA = len(AlignmentA)
-    lenB = len(AlignmentB)
-
-    if lenA >= lenB:
-        sim1, sim2 = AlignmentA, AlignmentB
-        len0 = lenA
-    else:
-        sim1, sim2 = AlignmentB, AlignmentA
-        len0 = lenB
-
-    # matches = len([True for k in range(len0) if sim1[k] is sim2[k]])
-    mismatches = len([False for k in range(len0) if sim1[k] is not sim2[k]])
-    # score = abs(F[-1][-1])
-
-    ## Visualize
-    # visual = list()
-    # for k in range(len0):
-    #     if sim1[k] is sim2[k]:
-    #         visual.append("|")
-    #     else:
-    #         visual.append(" ")
-    # print(AlignmentA, "".join(visual), AlignmentB, sep="\n", file=sys.stdout)
-
-    # similarity = 100.0 * matches / len0
-    # dissimilarity = 100.0 * mismatches / len0
-    print(mismatches, file=sys.stderr)
-
-    # return score
-    return mismatches
+    score = abs(F[-1][-1])
+    return score
 
 
 #**********************************************************************#
@@ -182,6 +102,37 @@ if __name__ == '__main__':
     
     # Parse command line options.
     input_file, threshold = option_parse()
+
+    # Scoring system and length differences. Swarm model is based on a
+    # mismatch penalty of 3 (p) and a gap opening penalty of 7 (d)
+    # if 0 < threshold < 7: max_length_difference = 0
+    # elif 7 <= threshold < 10: max_length_difference = 1
+    # elif 10 <= threshold < 13: max_length_difference = 2
+    # elif 13 <= threshold < 16: max_length_difference = 3
+    # elif 16 <= threshold < 19: max_length_difference = 4
+    # elif 19 <= threshold < 21: max_length_difference = 5
+    # else: max_length_difference = 100
+    # That can be expressed like that:
+    d = 7
+    p = 3
+    if 0 < threshold < 7:
+        max_length_difference = 0
+    else:
+        max_length_difference = ((threshold - d) / p) + 1
+
+    # Scoring system and max number of mismatches
+    # 0: identical sequences
+    # 3: 1 mismatch
+    # 6: 2 mismatches
+    # 7: 1 gap of length 1
+    # 9: 3 mismatches
+    # 10: 1 gap of length 2, or 1 gap of length 1 + 1 mismatch
+    # 12: 4 mismatches
+    # 13: 1 gap of length 3, or 1 gap of length 1 + 2 mismatches, or 1 gap of length 2 + 1 mismatch
+    # 14: 2 gaps of length 1 each
+    # 15: 5 mismatches
+    # 16: 1 gap of length 4, or 1 gap of length 1 + 3 mismatches, or 1 gap of length 2 + 2 mismatches, or 1 gap of length 3 + 1 mismatch 
+    max_number_of_mismatches = threshold / p
 
     # Build a list of sequences and count nucleotide occurences
     input_format = "fasta"
@@ -211,8 +162,8 @@ if __name__ == '__main__':
         swarm = [records_list[i][0]]
         status[i] = False
 
-        # List remaining non-swarmed sequences
-        comparisons = [j for j, state in enumerate(status) if state is True]
+        # List remaining non-swarmed sequences (boolean test)
+        comparisons = [j for j, state in enumerate(status) if state]
         
         # Deal with the last remaining item
         if not comparisons:
@@ -247,20 +198,12 @@ if __name__ == '__main__':
                     # sequences with a length difference greater than
                     # the threshold. Do not compare sequences if their
                     # nucleotide profiles are too divergent.
-                    hits = list()
-                    for j, d in candidates:
-                        if status[j] is True:
-                            if d <= frontier:
-                                if abs(cmp(records_list[l][2], records_list[j][2])) <= threshold:
-                                    if sum([abs(cmp(couple[0], couple[1])) for couple in zip(records_list[l][4], records_list[j][4])]) <= 2 * threshold - abs(cmp(records_list[l][2], records_list[j][2])):
-                                        if needleman_wunsch(records_list[l][3], records_list[j][3]) <= threshold:
-                                            hits.append(j)
-                    # hits = [j for j, d in candidates
-                    #         if status[j] is True
-                    #         and d <= frontier
-                    #         and abs(cmp(records_list[l][2], records_list[j][2])) <= threshold
-                    #         and sum([abs(cmp(couple[0], couple[1])) for couple in zip(records_list[l][4], records_list[j][4])]) <= 2 * threshold - abs(cmp(records_list[l][2], records_list[j][2]))
-                    #         and needleman_wunsch(records_list[l][3], records_list[j][3]) <= threshold]
+                    hits = [j for j, d in candidates
+                            if status[j]
+                            and d <= frontier
+                            and abs(cmp(records_list[l][2], records_list[j][2])) <= max_length_difference
+                            and sum([abs(cmp(couple[0], couple[1])) for couple in zip(records_list[l][4], records_list[j][4])]) <= 2 * max_number_of_mismatches - abs(cmp(records_list[l][2], records_list[j][2]))
+                            and needleman_wunsch(records_list[l][3], records_list[j][3]) <= threshold]
                     if hits:
                         nextseeds.extend(hits)
                         swarm.extend([records_list[j][0] for j in hits])
