@@ -8,7 +8,7 @@
 from __future__ import print_function
 
 __author__ = "Frédéric Mahé <mahe@rhrk.uni-kl.fr>"
-__date__ = "2012/12/28"
+__date__ = "2013/01/01"
 __version__ = "$Revision: 3.0"
 
 import sys
@@ -44,7 +44,7 @@ def option_parse():
         action = "store",
         dest = "threshold",
         type = "int",
-        default = 1,
+        default = 7,
         help = "set <THRESHOLD> for the swarm building.")
 
     (options, args) = parser.parse_args()
@@ -52,21 +52,13 @@ def option_parse():
     return options.input_file, options.threshold
 
 
-def needleman_wunsch(seqA, seqB):
+def needleman_wunsch(seqA, seqB, matrix, gap_opening_penalty):
     """
     Global pairwise alignment algorithm with a linear gap
     penalty. Code adapted from Wikipedia's Needleman-Wunsch
     pseudo-code
     (https://en.wikipedia.org/wiki/Needleman%E2%80%93Wunsch_algorithm).
     """
-    # Penalty matrix and gap penalty (d) used in Swarm (transformed
-    # +5/-4/+12/-4 model).
-    d = 7
-    S = {'a': {'a': 0, 'g': 3, 'c': 3, 't': 3},
-         'g': {'a': 3, 'g': 0, 'c': 3, 't': 3},
-         'c': {'a': 3, 'g': 3, 'c': 0, 't': 3},
-         't': {'a': 3, 'g': 3, 'c': 3, 't': 0}}
-
     # Initialize array F with zeroes (and set outer lines and columns
     # with cumulative penalty value)
     A = seqA
@@ -88,7 +80,7 @@ def needleman_wunsch(seqA, seqB):
             # Use max() for a similarity matrix 
             F[i][j] = min(match, insert, delete)
 
-    score = abs(F[-1][-1])
+    score = F[-1][-1]
     return score
 
 
@@ -103,6 +95,15 @@ if __name__ == '__main__':
     # Parse command line options.
     input_file, threshold = option_parse()
 
+    # Penalty matrix (S), mismatch penalty (p) and gap opening penalty
+    # (d) used in Swarm (transformed +5/-4/+12/-4 model).
+    d = 7
+    p = 3
+    S = {'a': {'a': 0, 'g': 3, 'c': 3, 't': 3},
+         'g': {'a': 3, 'g': 0, 'c': 3, 't': 3},
+         'c': {'a': 3, 'g': 3, 'c': 0, 't': 3},
+         't': {'a': 3, 'g': 3, 'c': 3, 't': 0}}
+
     # Scoring system and length differences. Swarm model is based on a
     # mismatch penalty of 3 (p) and a gap opening penalty of 7 (d)
     # if 0 < threshold < 7: max_length_difference = 0
@@ -113,8 +114,6 @@ if __name__ == '__main__':
     # elif 19 <= threshold < 21: max_length_difference = 5
     # else: max_length_difference = 100
     # That can be expressed like that:
-    d = 7
-    p = 3
     if 0 < threshold < 7:
         max_length_difference = 0
     else:
@@ -171,7 +170,7 @@ if __name__ == '__main__':
             break
 
         # Candidates list is initialized for each major seed
-        candidates = [(j, needleman_wunsch(records_list[i][3], records_list[j][3])) for j in comparisons]
+        candidates = [(j, needleman_wunsch(records_list[i][3], records_list[j][3], S, d)) for j in comparisons]
 
         # Parse candidates and select sons
         firstseeds = [j for j, d in candidates if d <= threshold]
@@ -203,7 +202,7 @@ if __name__ == '__main__':
                             and d <= frontier
                             and abs(cmp(records_list[l][2], records_list[j][2])) <= max_length_difference
                             and sum([abs(cmp(couple[0], couple[1])) for couple in zip(records_list[l][4], records_list[j][4])]) <= 2 * max_number_of_mismatches - abs(cmp(records_list[l][2], records_list[j][2]))
-                            and needleman_wunsch(records_list[l][3], records_list[j][3]) <= threshold]
+                            and needleman_wunsch(records_list[l][3], records_list[j][3], S, d) <= threshold]
                     if hits:
                         nextseeds.extend(hits)
                         swarm.extend([records_list[j][0] for j in hits])
