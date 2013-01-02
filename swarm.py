@@ -72,12 +72,16 @@ def needleman_wunsch(seqA, seqB, matrix, gap_opening_penalty):
         F[0][j] = d * j
 	
     ## Scoring
+    #
+    # Replace S mapping with a simple if statement (faster)? If the
+    # matrix is symetrical (delete == insert penalty), there is no
+    # need to compute both? In think I am wrong.
     for i in I[1:]:
 	for j in J[1:]:
             match = F[i-1][j-1] + S[A[i-1]][B[j-1]]
             delete = F[i-1][j] + d
             insert = F[i][j-1] + d
-            # Use max() for a similarity matrix 
+            # Use max() if F is a similarity matrix 
             F[i][j] = min(match, insert, delete)
 
     score = F[-1][-1]
@@ -95,8 +99,8 @@ if __name__ == '__main__':
     # Parse command line options.
     input_file, threshold = option_parse()
 
-    # Penalty matrix (S), mismatch penalty (p) and gap opening penalty
-    # (d) used in Swarm (transformed +5/-4/+12/-4 model).
+    # Substitution matrix (S), mismatch penalty (p) and gap opening
+    # penalty (d) used in Swarm (transformed +5/-4/+12/-4 model).
     d = 7
     p = 3
     S = {'a': {'a': 0, 'g': 3, 'c': 3, 't': 3},
@@ -200,8 +204,8 @@ if __name__ == '__main__':
                     hits = [j for j, d in candidates
                             if status[j]
                             and d <= frontier
-                            and abs(cmp(records_list[l][2], records_list[j][2])) <= max_length_difference
-                            and sum([abs(cmp(couple[0], couple[1])) for couple in zip(records_list[l][4], records_list[j][4])]) <= 2 * max_number_of_mismatches - abs(cmp(records_list[l][2], records_list[j][2]))
+                            and abs(cmp(records_list[l][2], records_list[j][2])) <= threshold # max_length_difference
+                            # and sum([abs(cmp(couple[0], couple[1])) for couple in zip(records_list[l][4], records_list[j][4])]) <= 2 * max_number_of_mismatches - abs(cmp(records_list[l][2], records_list[j][2]))
                             and needleman_wunsch(records_list[l][3], records_list[j][3], S, d) <= threshold]
                     if hits:
                         nextseeds.extend(hits)
