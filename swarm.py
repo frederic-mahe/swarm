@@ -122,7 +122,7 @@ if __name__ == '__main__':
     # elif 19 <= threshold < 21: max_length_difference = 5
     # else: max_length_difference = 100
     # That can be expressed like that:
-    if 0 < threshold < 7:
+    if threshold < d:
         max_length_difference = 0
     else:
         max_length_difference = ((threshold - d) / p) + 1
