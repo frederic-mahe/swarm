@@ -52,13 +52,21 @@ def option_parse():
     return options.input_file, options.threshold
 
 
-def needleman_wunsch(seqA, seqB, matrix, gap_opening_penalty):
+def needleman_wunsch(seqA, seqB):
     """
     Global pairwise alignment algorithm with a linear gap
     penalty. Code adapted from Wikipedia's Needleman-Wunsch
     pseudo-code
     (https://en.wikipedia.org/wiki/Needleman%E2%80%93Wunsch_algorithm).
     """
+    # Substitution matrix (S), mismatch penalty (p) and gap opening
+    # penalty (d) used in Swarm (transformed +5/-4/+12/-4 model).
+    d = 7
+    S = {'a': {'a': 0, 'g': 3, 'c': 3, 't': 3},
+         'g': {'a': 3, 'g': 0, 'c': 3, 't': 3},
+         'c': {'a': 3, 'g': 3, 'c': 0, 't': 3},
+         't': {'a': 3, 'g': 3, 'c': 3, 't': 0}}
+
     # Initialize array F with zeroes (and set outer lines and columns
     # with cumulative penalty value)
     A = seqA
@@ -103,10 +111,6 @@ if __name__ == '__main__':
     # penalty (d) used in Swarm (transformed +5/-4/+12/-4 model).
     d = 7
     p = 3
-    S = {'a': {'a': 0, 'g': 3, 'c': 3, 't': 3},
-         'g': {'a': 3, 'g': 0, 'c': 3, 't': 3},
-         'c': {'a': 3, 'g': 3, 'c': 0, 't': 3},
-         't': {'a': 3, 'g': 3, 'c': 3, 't': 0}}
 
     # Scoring system and length differences. Swarm model is based on a
     # mismatch penalty of 3 (p) and a gap opening penalty of 7 (d)
@@ -174,7 +178,7 @@ if __name__ == '__main__':
             break
 
         # Candidates list is initialized for each major seed
-        candidates = [(j, needleman_wunsch(records_list[i][3], records_list[j][3], S, d)) for j in comparisons]
+        candidates = [(j, needleman_wunsch(records_list[i][3], records_list[j][3])) for j in comparisons]
 
         # Parse candidates and select sons
         firstseeds = [j for j, d in candidates if d <= threshold]
@@ -204,9 +208,9 @@ if __name__ == '__main__':
                     hits = [j for j, d in candidates
                             if status[j]
                             and d <= frontier
-                            and abs(cmp(records_list[l][2], records_list[j][2])) <= threshold # max_length_difference
-                            # and sum([abs(cmp(couple[0], couple[1])) for couple in zip(records_list[l][4], records_list[j][4])]) <= 2 * max_number_of_mismatches - abs(cmp(records_list[l][2], records_list[j][2]))
-                            and needleman_wunsch(records_list[l][3], records_list[j][3], S, d) <= threshold]
+                            and abs(cmp(records_list[l][2], records_list[j][2])) <= max_length_difference
+                            and sum([abs(cmp(couple[0], couple[1])) for couple in zip(records_list[l][4], records_list[j][4])]) <= 2 * max_number_of_mismatches - abs(cmp(records_list[l][2], records_list[j][2]))
+                            and needleman_wunsch(records_list[l][3], records_list[j][3]) <= threshold]
                     if hits:
                         nextseeds.extend(hits)
                         swarm.extend([records_list[j][0] for j in hits])
