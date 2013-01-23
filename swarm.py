@@ -245,3 +245,9 @@ sys.exit(0)
 #       4 3
 #       5 2
 #      56 1
+#
+#
+# To Do:
+#
+# - Refactoring and simplification of the code,
+# - write the needleman-wunsch function with numpy(?)
