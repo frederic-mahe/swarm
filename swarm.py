@@ -2,18 +2,19 @@
 # -*- coding: utf-8 -*-
 """
     Find clusters of nearly identical sequences in giant barcoding
-    projects.
+    projects. That version works with score values (not the number of
+    mismatches). Should I go back to counting mismatches? It saves the
+    backtracking, but complexifies the threshold computation.
 """
 
 from __future__ import print_function
 
 __author__ = "Frédéric Mahé <mahe@rhrk.uni-kl.fr>"
 __date__ = "2013/02/24"
-__version__ = "$Revision: 3.1"
+__version__ = "$Revision: 4.0"
 
 import sys
 from Bio import SeqIO
-from Bio.Seq import Seq
 from optparse import OptionParser
 
 #******************************************************************************#
@@ -22,34 +23,82 @@ from optparse import OptionParser
 #                                                                              #
 #******************************************************************************#
 
+
 def option_parse():
     """
     Parse arguments from command line.
     """
     desc = """Find clusters of nearly identical amplicons in giant
     amplicon-based environmental or clinical projects."""
-    
+
     parser = OptionParser(usage="usage: %prog --input_file filename --threshold integer",
-        description = desc,
-        version = "%prog version 1.0")
+                          description=desc,
+                          version="%prog version 1.0")
 
     parser.add_option("-i", "--input_file",
-        metavar = "<FILENAME>",
-        action = "store",
-        dest = "input_file",
-        help = "set <FILENAME> as input file. Ungapped fasta file (acgt only, case insensitive).")
+                      metavar="<FILENAME>",
+                      action="store",
+                      dest="input_file",
+                      help="set <FILENAME> as input file. Ungapped fasta file (acgt only, case insensitive).")
 
     parser.add_option("-t", "--threshold",
-        metavar = "<THRESHOLD>",
-        action = "store",
-        dest = "threshold",
-        type = "int",
-        default = 7,
-        help = "set <THRESHOLD> for the swarm building.")
+                      metavar="<THRESHOLD>",
+                      action="store",
+                      dest="threshold",
+                      type="int",
+                      default=7,
+                      help="set <THRESHOLD> for the swarm building.")
 
     (options, args) = parser.parse_args()
-    
     return options.input_file, options.threshold
+
+
+def parse_input_file(input_file):
+    """
+    Build a list of amplicons and count nucleotide occurences
+    """
+    input_format = "fasta"
+    nucleotides = ("a", "c", "g", "t")
+    with open(input_file, "rU") as input_file:
+        amplicons = [(record.id.split("_")[0],
+                      record.id.split("_")[1],
+                      len(record.seq),
+                      str(record.seq),
+                      [record.seq.lower().count(n) for n in nucleotides])
+                     for record in SeqIO.parse(input_file, input_format)]
+        status = [True] * len(amplicons)
+    return amplicons, status
+
+
+def limits(threshold):
+    """
+    Scoring system and length differences (limit values).
+    """
+    # Swarm model is based on a mismatch penalty of 3 (p) and a gap
+    # opening penalty of 7 (d)
+    d = 7
+    p = 3
+
+    # From the Sellers pairwise alignment score, it is possible to
+    # deduce the maximum possible length difference between the two
+    # amplicons, and the maximum number of mismatches.
+    #  0: identical amplicons
+    #  3: 1 mismatch
+    #  6: 2 mismatches
+    #  7: 1 gap of length 1
+    #  9: 3 mismatches
+    # 10: 1 gap of length 2, or 1 gap of length 1 + 1 mismatch
+    # 12: 4 mismatches
+    # 13: 1 gap of length 3, or 1 gap of length 1 + 2 mismatches, or 1 gap of length 2 + 1 mismatch
+    # 14: 2 gaps of length 1 each
+    # 15: 5 mismatches
+    # 16: 1 gap of length 4, or 1 gap of length 1 + 3 mismatches, or 1 gap of length 2 + 2 mismatches, or 1 gap of length 3 + 1 mismatch
+    max_number_of_mismatches = threshold / p  # That value could be more precise
+    if threshold < d:
+        max_length_difference = 0
+    else:
+        max_length_difference = ((threshold - d) / p) + 1
+    return max_length_difference, max_number_of_mismatches
 
 
 def needleman_wunsch(seqA, seqB):
@@ -78,18 +127,18 @@ def needleman_wunsch(seqA, seqB):
         F[i][0] = d * i
     for j in J:
         F[0][j] = d * j
-	
+
     ## Scoring
     #
     # Replace S mapping with a simple if statement (faster)? If the
     # matrix is symetrical (delete == insert penalty), there is no
     # need to compute both? I think I am wrong.
     for i in I[1:]:
-	for j in J[1:]:
+        for j in J[1:]:
             match = F[i-1][j-1] + S[A[i-1]][B[j-1]]
             delete = F[i-1][j] + d
             insert = F[i][j-1] + d
-            # Use max() if F is a similarity matrix 
+            # Use max() if F is a similarity matrix
             F[i][j] = min(match, insert, delete)
 
     score = F[-1][-1]
@@ -106,9 +155,6 @@ def find_kseeds(candidates, status, frontier, amplicons, max_length_difference,
     the seed. Do not compare amplicons with a length difference
     greater than the threshold. Do not compare amplicons if their
     nucleotide profiles are too divergent.
-    
-    Note: the wrapping is not correct here (line too long), but do not
-    know how to correct it.
     """
     hits = [j for j, d in candidates
             if status[j] and
@@ -118,62 +164,24 @@ def find_kseeds(candidates, status, frontier, amplicons, max_length_difference,
             needleman_wunsch(amplicons[l][3], amplicons[j][3]) <= threshold]
     return hits
 
-#******************************************************************************#
-#                                                                              #
-#                                     Body                                     #
-#                                                                              #
-#******************************************************************************#
+
+#*****************************************************************************#
+#                                                                             #
+#                                     Body                                    #
+#                                                                             #
+#*****************************************************************************#
 
 if __name__ == '__main__':
-    
+
     # Parse command line options.
     input_file, threshold = option_parse()
 
-    # Substitution matrix (S), mismatch penalty (p) and gap opening
-    # penalty (d) used in Swarm (transformed +5/-4/+12/-4 model).
-    d = 7
-    p = 3
-
-    # Scoring system and length differences. Swarm model is based on a
-    # mismatch penalty of 3 (p) and a gap opening penalty of 7 (d)
-    # if 0 < threshold < 7: max_length_difference = 0
-    # elif 7 <= threshold < 10: max_length_difference = 1
-    # elif 10 <= threshold < 13: max_length_difference = 2
-    # elif 13 <= threshold < 16: max_length_difference = 3
-    # elif 16 <= threshold < 19: max_length_difference = 4
-    # elif 19 <= threshold < 21: max_length_difference = 5
-    # That can be expressed like that:
-    if threshold < d:
-        max_length_difference = 0
-    else:
-        max_length_difference = ((threshold - d) / p) + 1
-
-    # Scoring system and max number of mismatches
-    # 0: identical amplicons
-    # 3: 1 mismatch
-    # 6: 2 mismatches
-    # 7: 1 gap of length 1
-    # 9: 3 mismatches
-    # 10: 1 gap of length 2, or 1 gap of length 1 + 1 mismatch
-    # 12: 4 mismatches
-    # 13: 1 gap of length 3, or 1 gap of length 1 + 2 mismatches, or 1 gap of length 2 + 1 mismatch
-    # 14: 2 gaps of length 1 each
-    # 15: 5 mismatches
-    # 16: 1 gap of length 4, or 1 gap of length 1 + 3 mismatches, or 1 gap of length 2 + 2 mismatches, or 1 gap of length 3 + 1 mismatch 
-    max_number_of_mismatches = threshold / p
+    # Compute limits
+    max_length_difference, max_number_of_mismatches = limits(threshold)
 
     # Build a list of amplicons and count nucleotide occurences
-    input_format = "fasta"
-    nucleotides = ("a","c","g","t")
-    with open(input_file, "rU") as input_file:
-        amplicons = [(record.id.split("_")[0],
-                    record.id.split("_")[1],
-                    len(record.seq),
-                    str(record.seq),
-                    [record.seq.lower().count(n) for n in nucleotides])
-                   for record in SeqIO.parse(input_file, input_format)]
-        status = [True] * len(amplicons)
-        
+    amplicons, status = parse_input_file(input_file)
+
     # Start swarming
     while True:
         try:
@@ -188,7 +196,7 @@ if __name__ == '__main__':
 
         # List remaining non-swarmed amplicons (status set to True)
         comparisons = [j for j, status[j] in enumerate(status) if status[j]]
-        
+
         # No amplicons remain, stop the process
         if not comparisons:
             print(" ".join(swarm), file=sys.stdout)
@@ -202,7 +210,8 @@ if __name__ == '__main__':
         # Parse candidates and select the first generation of subseeds
         firstseeds = [j for j, d in candidates if d <= threshold]
         swarm.extend([amplicons[j][0] for j in firstseeds])
-        for j in firstseeds: status[j] = False
+        for j in firstseeds:
+            status[j] = False
 
         # Loop other the first subseeds (if they exist)
         all_subseeds = list()
@@ -219,7 +228,8 @@ if __name__ == '__main__':
                     if hits:
                         nextseeds.extend(hits)
                         swarm.extend([amplicons[j][0] for j in hits])
-                        for j in hits: status[j] = False
+                        for j in hits:
+                            status[j] = False
                 # Stop condition
                 if nextseeds:
                     all_subseeds.append(nextseeds)
@@ -230,7 +240,7 @@ if __name__ == '__main__':
         else:
             # Deal with isolated amplicons
             print(" ".join(swarm), file=sys.stdout)
-        
+
 sys.exit(0)
 
 # Profiling
