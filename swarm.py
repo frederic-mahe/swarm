@@ -14,6 +14,7 @@ __date__ = "2013/02/24"
 __version__ = "$Revision: 4.0"
 
 import sys
+import itertools
 from Bio import SeqIO
 from optparse import OptionParser
 
@@ -68,6 +69,37 @@ def parse_input_file(input_file):
                      for record in SeqIO.parse(input_file, input_format)]
         status = [True] * len(amplicons)
     return amplicons, status
+
+
+def compute_kmer_vectors(amplicons, k):
+    """
+    Produce a kmer-vector representation for all amplicons
+    """
+    # Create a list of all possible kmers
+    all_kmers = ["".join(kmer)
+                 for kmer in itertools.product('acgt', repeat=k)]
+    # Represent each amplicon as a 4^k-vector of booleans
+    vectors = list()
+    for amplicon in amplicons:
+        sequence = amplicon[3]
+        amplicon_kmers = set([sequence[i:i+k]
+                              for i in range(len(sequence) - k)])
+        vector = [kmer in amplicon_kmers for kmer in all_kmers]
+        vectors.append(vector)
+    return vectors
+
+
+def compare_vectors(seed_vector, candidate_vectors):
+    """
+    XOR and POPCNT the seed vector against all candidate vectors
+    """
+    popcnts = []
+    for candidate_vector in candidate_vectors:
+        xoring = [status1 ^ status2
+                  for status1, status2 in zip(seed_vector, candidate_vector)]
+        popcnt = xoring.count(True)
+        popcnts.append(popcnt)
+    return popcnts
 
 
 def needleman_wunsch(seqA, seqB):
@@ -187,6 +219,24 @@ if __name__ == '__main__':
     # Build a list of amplicons and count nucleotide occurences
     amplicons, status = parse_input_file(input_file)
 
+    ## Create a list of all possible kmers
+    k = 5
+    vectors = compute_kmer_vectors(amplicons, k)
+    
+    # Torbjørn formula is mindiff = (popcnt + 2*k - 1)/(2*k). I don't
+    # understand why. I double-checked the maximum acceptable popcnt
+    # is: d * k *2
+    #
+    ## Search for the best threshold (compare scores and popcnts) 
+    # for i in range(len(vectors)):
+    #     for j in range(i+1, len(vectors)):
+    #         xoring, popcnt = compare_vectors(vectors[i], vectors[j])
+    #         mismatches = needleman_wunsch(amplicons[i][3], amplicons[j][3])
+    #         length = abs(amplicons[i][2] - amplicons[j][2])
+    #         print(mismatches, popcnt, length, sep="\t")
+    #         print(amplicons[i][3], amplicons[j][3], sep="\n")
+    #         print(xoring)
+
     # Start swarming
     while True:
         try:
@@ -227,8 +277,8 @@ if __name__ == '__main__':
                 nextseeds = list()
                 frontier = (k + 2) * threshold
                 for l in subseeds:
-                    hits = find_kseeds(candidates, status, frontier,
-                                       amplicons, threshold)
+                    hits = find_kseeds(candidates, status, frontier, amplicons,
+                                       threshold)
                     if hits:
                         nextseeds.extend(hits)
                         swarm.extend([amplicons[j][0] for j in hits])
