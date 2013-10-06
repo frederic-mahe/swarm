@@ -46,7 +46,7 @@ def option_parse():
                       action="store",
                       dest="threshold",
                       type="int",
-                      default=7,
+                      default=1,
                       help="set <THRESHOLD> for the swarm building.")
 
     (options, args) = parser.parse_args()
@@ -68,37 +68,6 @@ def parse_input_file(input_file):
                      for record in SeqIO.parse(input_file, input_format)]
         status = [True] * len(amplicons)
     return amplicons, status
-
-
-def limits(threshold):
-    """
-    Scoring system and length differences (limit values).
-    """
-    # Swarm model is based on a mismatch penalty of 3 (p) and a gap
-    # opening penalty of 7 (d)
-    d = 7
-    p = 3
-
-    # From the Sellers pairwise alignment score, it is possible to
-    # deduce the maximum possible length difference between the two
-    # amplicons, and the maximum number of mismatches.
-    #  0: identical amplicons
-    #  3: 1 mismatch
-    #  6: 2 mismatches
-    #  7: 1 gap of length 1
-    #  9: 3 mismatches
-    # 10: 1 gap of length 2, or 1 gap of length 1 + 1 mismatch
-    # 12: 4 mismatches
-    # 13: 1 gap of length 3, or 1 gap of length 1 + 2 mismatches, or 1 gap of length 2 + 1 mismatch
-    # 14: 2 gaps of length 1 each
-    # 15: 5 mismatches
-    # 16: 1 gap of length 4, or 1 gap of length 1 + 3 mismatches, or 1 gap of length 2 + 2 mismatches, or 1 gap of length 3 + 1 mismatch
-    max_number_of_mismatches = threshold / p  # That value could be more precise
-    if threshold < d:
-        max_length_difference = 0
-    else:
-        max_length_difference = ((threshold - d) / p) + 1
-    return max_length_difference, max_number_of_mismatches
 
 
 def needleman_wunsch(seqA, seqB):
@@ -128,25 +97,65 @@ def needleman_wunsch(seqA, seqB):
     for j in J:
         F[0][j] = d * j
 
-    ## Scoring
-    #
-    # Replace S mapping with a simple if statement (faster)? If the
-    # matrix is symetrical (delete == insert penalty), there is no
-    # need to compute both? I think I am wrong.
+    # Compute score for each cell
     for i in I[1:]:
         for j in J[1:]:
             match = F[i-1][j-1] + S[A[i-1]][B[j-1]]
             delete = F[i-1][j] + d
             insert = F[i][j-1] + d
-            # Use max() if F is a similarity matrix
+            # Use max() for a similarity matrix
             F[i][j] = min(match, insert, delete)
 
-    score = F[-1][-1]
-    return score
+    # Trackback
+    AlignmentA = list()
+    AlignmentB = list()
+    i = len(A)
+    j = len(B)
+
+    while i > 0 and j > 0:
+        Score = F[i][j]
+        ScoreDiag = F[i - 1][j - 1]
+        ScoreUp = F[i][j - 1]
+        ScoreLeft = F[i - 1][j]
+        if Score == ScoreDiag + S[A[i-1]][B[j-1]]:
+            AlignmentA.append(A[i-1])
+            AlignmentB.append(B[j-1])
+            i -= 1
+            j -= 1
+        elif Score == ScoreLeft + d:
+            AlignmentA.append(A[i-1])
+            AlignmentB.append("-")
+            i -= 1
+        elif Score == ScoreUp + d:
+            AlignmentA.append("-")
+            AlignmentB.append(B[j-1])
+            j -= 1
+        else:
+            print("Something went really bad!", A, B, sep="\n", file=sys.stderr)
+            sys.exit(-1)
+    # Deal with overhanging 5' parts (replace a while loop)
+    if i:
+        AlignmentA.extend(A[i-1:])
+        AlignmentB.extend("-" * i)
+    if j:
+        AlignmentA.extend("-" * j)
+        AlignmentB.extend(B[j-1:])
+
+    # Mismatches
+    AlignmentA = "".join(AlignmentA[::-1])
+    AlignmentB = "".join(AlignmentB[::-1])
+    lenA = len(AlignmentA)
+    lenB = len(AlignmentB)
+
+    if lenA != lenB:
+        print("Something went really bad!", lenA, lenB, file=sys.stderr)
+
+    mismatches = len([False for k in xrange(lenA)
+                      if AlignmentA[k] is not AlignmentB[k]])
+    return mismatches
 
 
-def find_kseeds(candidates, status, frontier, amplicons, max_length_difference,
-                max_number_of_mismatches, threshold):
+def find_kseeds(candidates, status, frontier, amplicons, threshold):
     """
     For a given subseed, find all k-seeds with threshold or less
     differences with the subseed. Candidates already have been
@@ -159,8 +168,7 @@ def find_kseeds(candidates, status, frontier, amplicons, max_length_difference,
     hits = [j for j, d in candidates
             if status[j] and
             d <= frontier and
-            abs(cmp(amplicons[l][2], amplicons[j][2])) <= max_length_difference and
-            sum([abs(cmp(couple[0], couple[1])) for couple in zip(amplicons[l][4], amplicons[j][4])]) <= 2 * max_number_of_mismatches - abs(cmp(amplicons[l][2], amplicons[j][2])) and
+            sum([abs(cmp(couple[0], couple[1])) for couple in zip(amplicons[l][4], amplicons[j][4])]) <= 2 * threshold - abs(cmp(amplicons[l][2], amplicons[j][2])) and
             needleman_wunsch(amplicons[l][3], amplicons[j][3]) <= threshold]
     return hits
 
@@ -175,9 +183,6 @@ if __name__ == '__main__':
 
     # Parse command line options.
     input_file, threshold = option_parse()
-
-    # Compute limits
-    max_length_difference, max_number_of_mismatches = limits(threshold)
 
     # Build a list of amplicons and count nucleotide occurences
     amplicons, status = parse_input_file(input_file)
@@ -197,7 +202,7 @@ if __name__ == '__main__':
         # List remaining non-swarmed amplicons (status set to True)
         comparisons = [j for j, status[j] in enumerate(status) if status[j]]
 
-        # No amplicons remain, stop the process
+        # No amplicon remains, stop the process
         if not comparisons:
             print(" ".join(swarm), file=sys.stdout)
             break
@@ -223,8 +228,7 @@ if __name__ == '__main__':
                 frontier = (k + 2) * threshold
                 for l in subseeds:
                     hits = find_kseeds(candidates, status, frontier,
-                                       amplicons, max_length_difference,
-                                       max_number_of_mismatches, threshold)
+                                       amplicons, threshold)
                     if hits:
                         nextseeds.extend(hits)
                         swarm.extend([amplicons[j][0] for j in hits])
@@ -252,10 +256,11 @@ sys.exit(0)
 # ----------------
 #
 # time python swarm.py -i ../examples/AF091148.fas | awk '{print NF}' | sort -nr | uniq -c
-#  1 1310
-#  1 31
+#  1 878
+#  1 423
 #  1 15
+#  1 5
 #  1 4
-#  3 2
-# 37 1
-#
+#  4 3
+#  5 2
+# 56 1
