@@ -94,11 +94,11 @@ def compare_vectors(seed_vector, candidate_vectors):
     XOR and POPCNT the seed vector against all candidate vectors
     """
     popcnts = []
-    for candidate_vector in candidate_vectors:
+    for j, candidate_vector in candidate_vectors:
         xoring = [status1 ^ status2
                   for status1, status2 in zip(seed_vector, candidate_vector)]
         popcnt = xoring.count(True)
-        popcnts.append(popcnt)
+        popcnts.append((j, popcnt))
     return popcnts
 
 
@@ -187,21 +187,19 @@ def needleman_wunsch(seqA, seqB):
     return mismatches
 
 
-def find_kseeds(candidates, status, frontier, amplicons, threshold):
+def find_kseeds(candidates, amplicons, threshold, i):
     """
     For a given subseed, find all k-seeds with threshold or less
     differences with the subseed. Candidates already have been
     filtered for "left hand" reads. Do not treat already assigned
-    amplicons. Do not compare amplicons we know to be too distant from
-    the seed. Do not compare amplicons with a length difference
+    amplicons. Do not compare amplicons with a length difference
     greater than the threshold. Do not compare amplicons if their
     nucleotide profiles are too divergent.
     """
-    hits = [j for j, d in candidates
-            if status[j] and
-            d <= frontier and
-            sum([abs(cmp(couple[0], couple[1])) for couple in zip(amplicons[l][4], amplicons[j][4])]) <= 2 * threshold - abs(cmp(amplicons[l][2], amplicons[j][2])) and
-            needleman_wunsch(amplicons[l][3], amplicons[j][3]) <= threshold]
+    # I do not use the nucleotide composition comparisons
+    # sum([abs(cmp(couple[0], couple[1])) for couple in zip(amplicons[i][4], amplicons[j][4])]) <= 2 * threshold - abs(cmp(amplicons[i][2], amplicons[j][2]))
+    hits = [j for j in candidates
+            if needleman_wunsch(amplicons[i][3], amplicons[j][3]) <= threshold]
     return hits
 
 
@@ -222,78 +220,64 @@ if __name__ == '__main__':
     ## Create a list of all possible kmers
     k = 5
     vectors = compute_kmer_vectors(amplicons, k)
-    
+
     # Torbjørn formula is mindiff = (popcnt + 2*k - 1)/(2*k). I don't
     # understand why. I double-checked the maximum acceptable popcnt
     # is: d * k *2
-    #
-    ## Search for the best threshold (compare scores and popcnts) 
-    # for i in range(len(vectors)):
-    #     for j in range(i+1, len(vectors)):
-    #         xoring, popcnt = compare_vectors(vectors[i], vectors[j])
-    #         mismatches = needleman_wunsch(amplicons[i][3], amplicons[j][3])
-    #         length = abs(amplicons[i][2] - amplicons[j][2])
-    #         print(mismatches, popcnt, length, sep="\t")
-    #         print(amplicons[i][3], amplicons[j][3], sep="\n")
-    #         print(xoring)
 
     # Start swarming
-    while True:
-        try:
-            # Search the next master seed (first amplicon with status
-            # set to "True")
-            i = status.index(True)
-            swarm = [amplicons[i][0]]
-            status[i] = False
-        except ValueError:
-            # All amplicons have been treated, stop the process
-            break
+    for i, amplicon in enumerate(amplicons):
 
-        # List remaining non-swarmed amplicons (status set to True)
-        comparisons = [j for j, status[j] in enumerate(status) if status[j]]
+        if not status[i]:  # Skip amplicons already swarmed
+            continue
 
-        # No amplicon remains, stop the process
-        if not comparisons:
+        swarm = [amplicons[i][0]]
+        status[i] = False
+
+        candidate_vectors = [(j, vectors[j]) for j, status[j] in enumerate(status) if status[j]]
+        if not candidate_vectors:  # No more amplicon, stop swarm
             print(" ".join(swarm), file=sys.stdout)
             break
 
-        # Compute and store pairwise distances between the master seed
-        # and all remaining amplicons ("candidates")
-        candidates = [(j, needleman_wunsch(amplicons[i][3], amplicons[j][3]))
-                      for j in comparisons]
-
-        # Parse candidates and select the first generation of subseeds
-        firstseeds = [j for j, d in candidates if d <= threshold]
-        swarm.extend([amplicons[j][0] for j in firstseeds])
-        for j in firstseeds:
-            status[j] = False
-
-        # Loop other the first subseeds (if they exist)
-        all_subseeds = list()
-        if firstseeds:
-            all_subseeds.append(firstseeds)
-            # Loop other the list of firstseeds lists
-            for k, subseeds in enumerate(all_subseeds):
-                nextseeds = list()
-                frontier = (k + 2) * threshold
-                for l in subseeds:
-                    hits = find_kseeds(candidates, status, frontier, amplicons,
-                                       threshold)
-                    if hits:
-                        nextseeds.extend(hits)
-                        swarm.extend([amplicons[j][0] for j in hits])
-                        for j in hits:
-                            status[j] = False
-                # Stop condition
-                if nextseeds:
-                    all_subseeds.append(nextseeds)
-                else:
-                    # No new subseeds
-                    print(" ".join(swarm), file=sys.stdout)
-                    break
-        else:
-            # Deal with isolated amplicons
+        # Search sub-seed candidates
+        popcnts = compare_vectors(vectors[i], candidate_vectors)
+        candidates_nw = [j for j, popcnt in popcnts if popcnt <= 2 * threshold * k]
+        if not candidates_nw:  # subseed has no sons
             print(" ".join(swarm), file=sys.stdout)
+            continue
+        hits = find_kseeds(candidates_nw, amplicons, threshold, i)
+        if not hits:  # Singleton, go to the next master seed
+            print(" ".join(swarm), file=sys.stdout)
+            continue
+        swarm.extend([amplicons[j][0] for j in hits])
+        for hit in hits:
+            status[hit] = False
+
+        # Work on subseeds
+        all_subseeds = [hits]
+        for subseeds in all_subseeds:
+            nextseeds = list()
+            for l in subseeds:
+                status[l] = False
+                # To break superswarms, I just had to allow only
+                # candidates on the right side of l (i.e. at l+1)
+                candidate_vectors = [(j, vectors[j]) for j, status[j] in enumerate(status) if status[j]]
+                if not candidate_vectors:  # subseed may have no sons
+                    continue
+                popcnts = compare_vectors(vectors[l], candidate_vectors)
+                candidates_nw = [j for j, popcnt in popcnts if popcnt <= 2 * threshold * k]
+                if not candidates_nw:  # subseed has no sons
+                    continue
+                hits = find_kseeds(candidates_nw, amplicons, threshold, l)
+                if hits:
+                    nextseeds.extend(hits)
+                    swarm.extend([amplicons[hit][0] for hit in hits])
+                    for hit in hits:
+                        status[hit] = False
+            if not nextseeds:  # No new subseeds
+                print(" ".join(swarm), file=sys.stdout)
+                break
+            all_subseeds.append(nextseeds)
 
 sys.exit(0)
 
