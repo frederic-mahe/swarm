@@ -235,7 +235,7 @@ if __name__ == '__main__':
         status[i] = False
 
         candidate_vectors = [(j, vectors[j]) for j, status[j] in enumerate(status) if status[j]]
-        if not candidate_vectors:  # No more amplicon, stop swarm
+        if not candidate_vectors:  # No more amplicons, stop swarm
             print(" ".join(swarm), file=sys.stdout)
             break
 
@@ -262,8 +262,9 @@ if __name__ == '__main__':
                 # To break superswarms, I just had to allow only
                 # candidates on the right side of l (i.e. at l+1)
                 candidate_vectors = [(j, vectors[j]) for j, status[j] in enumerate(status) if status[j]]
-                if not candidate_vectors:  # subseed may have no sons
-                    continue
+                if not candidate_vectors:  # No more amplicons, stop swarm
+                    print(" ".join(swarm), file=sys.stdout)
+                    break
                 popcnts = compare_vectors(vectors[l], candidate_vectors)
                 candidates_nw = [j for j, popcnt in popcnts if popcnt <= 2 * threshold * k]
                 if not candidates_nw:  # subseed has no sons
