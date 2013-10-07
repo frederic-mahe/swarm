@@ -2,20 +2,19 @@
 # -*- coding: utf-8 -*-
 """
     Find clusters of nearly identical sequences in giant barcoding
-    projects. That version works with score values (not the number of
-    mismatches). Should I go back to counting mismatches? It saves the
-    backtracking, but complexifies the threshold computation.
+    projects.
 """
 
 from __future__ import print_function
 
 __author__ = "Frédéric Mahé <mahe@rhrk.uni-kl.fr>"
-__date__ = "2013/02/24"
-__version__ = "$Revision: 4.0"
+__date__ = "2013/10/07"
+__version__ = "$Revision: 6.0"
 
 import sys
 import itertools
 from Bio import SeqIO
+from bitarray import bitarray, bitdiff
 from optparse import OptionParser
 
 #******************************************************************************#
@@ -56,16 +55,14 @@ def option_parse():
 
 def parse_input_file(input_file):
     """
-    Build a list of amplicons and count nucleotide occurences
+    Build a list of amplicons
     """
     input_format = "fasta"
-    nucleotides = ("a", "c", "g", "t")
     with open(input_file, "rU") as input_file:
         amplicons = [(record.id.split("_")[0],
                       record.id.split("_")[1],
                       len(record.seq),
-                      str(record.seq),
-                      [record.seq.lower().count(n) for n in nucleotides])
+                      str(record.seq))
                      for record in SeqIO.parse(input_file, input_format)]
         status = [True] * len(amplicons)
     return amplicons, status
@@ -84,22 +81,20 @@ def compute_kmer_vectors(amplicons, k):
         sequence = amplicon[3]
         amplicon_kmers = set([sequence[i:i+k]
                               for i in range(len(sequence) - k)])
-        vector = [kmer in amplicon_kmers for kmer in all_kmers]
+        vector = bitarray([kmer in amplicon_kmers for kmer in all_kmers])
         vectors.append(vector)
     return vectors
 
 
-def compare_vectors(seed_vector, candidate_vectors):
+def compare_vectors(seed_vector, candidate_vectors, max_kmer_diff):
     """
     XOR and POPCNT the seed vector against all candidate vectors
+    (bitdiff does the same as (a ^ b).count(), but is more memory
+    efficient)
     """
-    popcnts = []
-    for j, candidate_vector in candidate_vectors:
-        xoring = [status1 ^ status2
-                  for status1, status2 in zip(seed_vector, candidate_vector)]
-        popcnt = xoring.count(True)
-        popcnts.append((j, popcnt))
-    return popcnts
+    candidates = [j for j, candidate_vector in candidate_vectors
+                  if bitdiff(seed_vector, candidate_vector) <= max_kmer_diff]
+    return candidates
 
 
 def needleman_wunsch(seqA, seqB):
@@ -187,22 +182,6 @@ def needleman_wunsch(seqA, seqB):
     return mismatches
 
 
-def find_kseeds(candidates, amplicons, threshold, i):
-    """
-    For a given subseed, find all k-seeds with threshold or less
-    differences with the subseed. Candidates already have been
-    filtered for "left hand" reads. Do not treat already assigned
-    amplicons. Do not compare amplicons with a length difference
-    greater than the threshold. Do not compare amplicons if their
-    nucleotide profiles are too divergent.
-    """
-    # I do not use the nucleotide composition comparisons
-    # sum([abs(cmp(couple[0], couple[1])) for couple in zip(amplicons[i][4], amplicons[j][4])]) <= 2 * threshold - abs(cmp(amplicons[i][2], amplicons[j][2]))
-    hits = [j for j in candidates
-            if needleman_wunsch(amplicons[i][3], amplicons[j][3]) <= threshold]
-    return hits
-
-
 #*****************************************************************************#
 #                                                                             #
 #                                     Body                                    #
@@ -224,6 +203,7 @@ if __name__ == '__main__':
     # Torbjørn formula is mindiff = (popcnt + 2*k - 1)/(2*k). I don't
     # understand why. I double-checked the maximum acceptable popcnt
     # is: d * k *2
+    max_kmer_diff = threshold * k * 2
 
     # Start swarming
     for i, amplicon in enumerate(amplicons):
@@ -234,18 +214,19 @@ if __name__ == '__main__':
         swarm = [amplicons[i][0]]
         status[i] = False
 
+        # List remaining amplicons
         candidate_vectors = [(j, vectors[j]) for j, status[j] in enumerate(status) if status[j]]
         if not candidate_vectors:  # No more amplicons, stop swarm
             print(" ".join(swarm), file=sys.stdout)
             break
 
         # Search sub-seed candidates
-        popcnts = compare_vectors(vectors[i], candidate_vectors)
-        candidates_nw = [j for j, popcnt in popcnts if popcnt <= 2 * threshold * k]
+        candidates_nw = compare_vectors(vectors[i], candidate_vectors, max_kmer_diff)
         if not candidates_nw:  # subseed has no sons
             print(" ".join(swarm), file=sys.stdout)
             continue
-        hits = find_kseeds(candidates_nw, amplicons, threshold, i)
+        hits = [j for j in candidates_nw
+                if needleman_wunsch(amplicons[i][3], amplicons[j][3]) <= threshold]
         if not hits:  # Singleton, go to the next master seed
             print(" ".join(swarm), file=sys.stdout)
             continue
@@ -265,11 +246,11 @@ if __name__ == '__main__':
                 if not candidate_vectors:  # No more amplicons, stop swarm
                     print(" ".join(swarm), file=sys.stdout)
                     break
-                popcnts = compare_vectors(vectors[l], candidate_vectors)
-                candidates_nw = [j for j, popcnt in popcnts if popcnt <= 2 * threshold * k]
+                candidates_nw = compare_vectors(vectors[l], candidate_vectors, max_kmer_diff)
                 if not candidates_nw:  # subseed has no sons
                     continue
-                hits = find_kseeds(candidates_nw, amplicons, threshold, l)
+                hits = [j for j in candidates_nw
+                        if needleman_wunsch(amplicons[l][3], amplicons[j][3]) <= threshold]
                 if hits:
                     nextseeds.extend(hits)
                     swarm.extend([amplicons[hit][0] for hit in hits])
