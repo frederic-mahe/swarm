@@ -280,3 +280,13 @@ sys.exit(0)
 #  4 3
 #  5 2
 # 56 1
+
+# The next step is to introduce 3-mer and 4-mer, to evaluate the number
+# of 5-mer comparisons avoided. I also tried using 6-mers and it yielded
+# a 10 s gain (34 s to run). The future is maybe to compute 6-mer
+# vectors or 7-mers vectors when needed to keep avoiding the cost of a
+# Needleman-Wunsch alignment.
+
+# Finally, I need a faster Needleman-Wunsch implementation. I can do my
+# own C version with python bindings, or wait for Torbjørn's version
+# prepared by Umer.
