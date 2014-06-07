@@ -8,7 +8,7 @@
 from __future__ import print_function
 
 __author__ = "Frédéric Mahé <mahe@rhrk.uni-kl.fr>"
-__date__ = "2013/10/07"
+__date__ = "2014/06/07"
 __version__ = "$Revision: 6.0"
 
 import sys
@@ -31,7 +31,7 @@ def option_parse():
     desc = """Find clusters of nearly identical amplicons in giant
     amplicon-based environmental or clinical projects."""
 
-    parser = OptionParser(usage="usage: %prog --input_file filename --threshold integer",
+    parser = OptionParser(usage="usage: %prog --input_file filename",
                           description=desc,
                           version="%prog version 1.0")
 
@@ -39,18 +39,10 @@ def option_parse():
                       metavar="<FILENAME>",
                       action="store",
                       dest="input_file",
-                      help="set <FILENAME> as input file. Ungapped fasta file (acgt only, case insensitive).")
-
-    parser.add_option("-t", "--threshold",
-                      metavar="<THRESHOLD>",
-                      action="store",
-                      dest="threshold",
-                      type="int",
-                      default=1,
-                      help="set <THRESHOLD> for the swarm building.")
+                      help="set <FILENAME> as input fasta file.")
 
     (options, args) = parser.parse_args()
-    return options.input_file, options.threshold
+    return options.input_file
 
 
 def parse_input_file(input_file):
@@ -58,43 +50,50 @@ def parse_input_file(input_file):
     Build a list of amplicons
     """
     input_format = "fasta"
+    amplicons = dict()
+    order = list()
     with open(input_file, "rU") as input_file:
-        amplicons = [(record.id.split("_")[0],
-                      record.id.split("_")[1],
-                      len(record.seq),
-                      str(record.seq))
-                     for record in SeqIO.parse(input_file, input_format)]
-        status = [True] * len(amplicons)
-    return amplicons, status
+        for record in SeqIO.parse(input_file, input_format):
+            amplicons[str(record.seq)] = [record.id,
+                                          len(record.seq),
+                                          True]
+            order.append(str(record.seq))
+    return amplicons, order
 
 
-def compute_kmer_vectors(amplicons, k):
+def produce_microvariants(seq):
     """
-    Produce a kmer-vector representation for all amplicons
-    """
-    # Create a list of all possible kmers
-    all_kmers = ["".join(kmer)
-                 for kmer in itertools.product('acgt', repeat=k)]
-    # Represent each amplicon as a 4^k-vector of booleans
-    vectors = list()
-    for amplicon in amplicons:
-        sequence = amplicon[3]
-        amplicon_kmers = set([sequence[i:i+k]
-                              for i in range(len(sequence) - k)])
-        vector = bitarray([kmer in amplicon_kmers for kmer in all_kmers])
-        vectors.append(vector)
-    return vectors
+    For a given sequence, produce without repetition all possible
+    micro-variants with one difference (mutation, insertion,
+    deletion).
 
-
-def compare_vectors(seed_vector, candidate_vectors, max_kmer_diff):
+    Some micro-variants are identical to the mother sequence: remove
+    them.
     """
-    XOR and POPCNT the seed vector against all candidate vectors
-    (bitdiff does the same as (a ^ b).count(), but is more memory
-    efficient)
-    """
-    candidates = [j for j, candidate_vector in candidate_vectors
-                  if bitdiff(seed_vector, candidate_vector) <= max_kmer_diff]
-    return candidates
+    nucleotides = ["a", "c", "g", "t"]
+    seq = list(seq)
+    length = len(seq)
+    microvariants = list()
+    # Insertions
+    for i in xrange(0, length + 1, 1):
+        for nuc in nucleotides:
+            microvariants.append("".join(seq[0:i] + [nuc] + seq[i:]))
+    # Mutations
+    for i in xrange(0, length, 1):
+        for nuc in nucleotides:
+            tmp = seq[:]
+            tmp[i] = nuc
+            microvariants.append("".join(tmp))
+    # Deletions
+    for i in xrange(0, length, 1):
+        tmp = seq[:]
+        del tmp[i]
+        microvariants.append("".join(tmp))
+    # Cleaning
+    microvariants = list(set(microvariants))
+    seq = "".join(seq)
+    del microvariants[microvariants.index(seq)]
+    return microvariants
 
 
 def pairwise_alignment(seed, candidate):
@@ -134,6 +133,68 @@ def pairwise_alignment(seed, candidate):
     return mismatches
 
 
+def main():
+    """
+    """
+    # Parse command line options.
+    input_file = option_parse()
+    threshold = 1
+
+    # Build a list of amplicons and count nucleotide occurences
+    amplicons, order = parse_input_file(input_file)
+
+    # Start swarming
+    for seed in order:
+        
+        amplicon = amplicons[seed]
+        
+        if not amplicon[2]:  # Skip amplicons already swarmed
+            continue
+
+        swarm = [amplicon[0]]
+        amplicons[seed][2] = False
+
+        # Create micro-variants
+        microvariants = produce_microvariants(seed)
+
+        # Which of these microvariants are in our dataset?
+        hits = [microvariant for microvariant in microvariants
+                if microvariant in amplicons and amplicons[microvariant][2]]
+
+        # Add them to the swarm (if any)
+        if not hits:  # Singleton, go to the next master seed
+            print(" ".join(swarm), file=sys.stdout)
+            continue
+        swarm.extend([amplicons[j][0] for j in hits])
+        for hit in hits:
+            amplicons[hit][2] = False
+
+        # Work on subseeds
+        all_subseeds = [hits]
+        for subseeds in all_subseeds:
+            nextseeds = list()
+            for subseed in subseeds:
+                amplicons[subseed][2] = False
+                # Search for k-seeds
+                microvariants = produce_microvariants(subseed)
+                hits = [microvariant for microvariant in microvariants
+                        if microvariant in amplicons and amplicons[microvariant][2]]
+                if not hits:  # subseed has no sons
+                    continue
+                nextseeds.extend(hits)
+                swarm.extend([amplicons[hit][0] for hit in hits])
+                for hit in hits:
+                    amplicons[hit][2] = False
+            if not nextseeds:  # No new subseeds
+                print(" ".join(swarm), file=sys.stdout)
+                break
+            all_subseeds.append(nextseeds)
+    else:
+        # Deal with the end of the amplicon list
+        print(" ".join(swarm), file=sys.stdout)
+    return
+
+
 #*****************************************************************************#
 #                                                                             #
 #                                     Body                                    #
@@ -142,76 +203,7 @@ def pairwise_alignment(seed, candidate):
 
 if __name__ == '__main__':
 
-    # Parse command line options.
-    input_file, threshold = option_parse()
-
-    # Build a list of amplicons and count nucleotide occurences
-    amplicons, status = parse_input_file(input_file)
-
-    ## Create a list of all possible kmers
-    k = 5
-    vectors = compute_kmer_vectors(amplicons, k)
-
-    # Torbjørn formula is mindiff = (popcnt + 2*k - 1)/(2*k). I don't
-    # understand why. I double-checked the maximum acceptable popcnt
-    # is: d * k *2
-    max_kmer_diff = threshold * k * 2
-
-    # Start swarming
-    for i, amplicon in enumerate(amplicons):
-
-        if not status[i]:  # Skip amplicons already swarmed
-            continue
-
-        swarm = [amplicons[i][0]]
-        status[i] = False
-
-        # List remaining amplicons
-        candidate_vectors = [(j, vectors[j]) for j, status[j] in enumerate(status) if status[j]]
-        if not candidate_vectors:  # No more amplicons, stop swarm
-            print(" ".join(swarm), file=sys.stdout)
-            break
-
-        # Search sub-seed candidates
-        candidates_nw = compare_vectors(vectors[i], candidate_vectors, max_kmer_diff)
-        if not candidates_nw:  # subseed has no sons
-            print(" ".join(swarm), file=sys.stdout)
-            continue
-        hits = [j for j in candidates_nw
-                if pairwise_alignment(amplicons[i][3], amplicons[j][3]) <= threshold]
-        if not hits:  # Singleton, go to the next master seed
-            print(" ".join(swarm), file=sys.stdout)
-            continue
-        swarm.extend([amplicons[j][0] for j in hits])
-        for hit in hits:
-            status[hit] = False
-
-        # Work on subseeds
-        all_subseeds = [hits]
-        for subseeds in all_subseeds:
-            nextseeds = list()
-            for l in subseeds:
-                status[l] = False
-                # To break superswarms, I just had to allow only
-                # candidates on the right side of l (i.e. at l+1)
-                candidate_vectors = [(j, vectors[j]) for j, status[j] in enumerate(status) if status[j]]
-                if not candidate_vectors:  # No more amplicons, stop swarm
-                    print(" ".join(swarm), file=sys.stdout)
-                    break
-                candidates_nw = compare_vectors(vectors[l], candidate_vectors, max_kmer_diff)
-                if not candidates_nw:  # subseed has no sons
-                    continue
-                hits = [j for j in candidates_nw
-                        if pairwise_alignment(amplicons[l][3], amplicons[j][3]) <= threshold]
-                if hits:
-                    nextseeds.extend(hits)
-                    swarm.extend([amplicons[hit][0] for hit in hits])
-                    for hit in hits:
-                        status[hit] = False
-            if not nextseeds:  # No new subseeds
-                print(" ".join(swarm), file=sys.stdout)
-                break
-            all_subseeds.append(nextseeds)
+    main()
 
 sys.exit(0)
 
