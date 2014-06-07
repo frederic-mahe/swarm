@@ -97,6 +97,43 @@ def compare_vectors(seed_vector, candidate_vectors, max_kmer_diff):
     return candidates
 
 
+def pairwise_alignment(seed, candidate):
+    """
+    Fast pairwise alignment (search only for a single mutation)
+    """
+    seed_length = len(seed)
+    candidate_length = len(candidate)
+    # Eliminate sequence too long or too short
+    diff = abs(seed_length - candidate_length)
+    if diff > 1:
+        mismatches = diff
+        return mismatches
+    # Identify the longest sequence (in practice, turn all
+    # insertion cases into deletions)
+    if seed_length >= candidate_length:
+        query, subject = seed, candidate
+    else:
+        query, subject = candidate, seed
+    # Compare the sequences character by character
+    length = len(query)
+    stop_forward = length
+    for i in xrange(0, length - 1, 1):
+        if query[i] != subject[i]:
+            stop_forward = i
+            break
+    stop_reverse = stop_forward
+    for i in xrange(1, length - stop_forward, 1):
+        if query[-i] != subject[-i]:
+            stop_reverse = length - i
+            break
+    # Do we detect a single mutation or insertion-deletion?
+    if stop_forward == stop_reverse:
+        mismatches = 1
+    else:
+        mismatches = 2
+    return mismatches
+
+
 def needleman_wunsch(seqA, seqB):
     """
     Global pairwise alignment algorithm with a linear gap
@@ -226,7 +263,7 @@ if __name__ == '__main__':
             print(" ".join(swarm), file=sys.stdout)
             continue
         hits = [j for j in candidates_nw
-                if needleman_wunsch(amplicons[i][3], amplicons[j][3]) <= threshold]
+                if pairwise_alignment(amplicons[i][3], amplicons[j][3]) <= threshold]
         if not hits:  # Singleton, go to the next master seed
             print(" ".join(swarm), file=sys.stdout)
             continue
@@ -250,7 +287,7 @@ if __name__ == '__main__':
                 if not candidates_nw:  # subseed has no sons
                     continue
                 hits = [j for j in candidates_nw
-                        if needleman_wunsch(amplicons[l][3], amplicons[j][3]) <= threshold]
+                        if pairwise_alignment(amplicons[l][3], amplicons[j][3]) <= threshold]
                 if hits:
                     nextseeds.extend(hits)
                     swarm.extend([amplicons[hit][0] for hit in hits])
