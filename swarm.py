@@ -12,16 +12,14 @@ __date__ = "2014/06/07"
 __version__ = "$Revision: 6.0"
 
 import sys
-import itertools
 from Bio import SeqIO
-from bitarray import bitarray, bitdiff
 from optparse import OptionParser
 
-#******************************************************************************#
-#                                                                              #
-#                                  Functions                                   #
-#                                                                              #
-#******************************************************************************#
+#*****************************************************************************#
+#                                                                             #
+#                                  Functions                                  #
+#                                                                             #
+#*****************************************************************************#
 
 
 def option_parse():
@@ -96,58 +94,19 @@ def produce_microvariants(seq):
     return microvariants
 
 
-def pairwise_alignment(seed, candidate):
-    """
-    Fast pairwise alignment (search only for a single mutation)
-    """
-    seed_length = len(seed)
-    candidate_length = len(candidate)
-    # Eliminate sequence too long or too short
-    diff = abs(seed_length - candidate_length)
-    if diff > 1:
-        mismatches = diff
-        return mismatches
-    # Identify the longest sequence (in practice, turn all
-    # insertion cases into deletions)
-    if seed_length >= candidate_length:
-        query, subject = seed, candidate
-    else:
-        query, subject = candidate, seed
-    # Compare the sequences character by character
-    length = len(query)
-    stop_forward = length
-    for i in xrange(0, length - 1, 1):
-        if query[i] != subject[i]:
-            stop_forward = i
-            break
-    stop_reverse = stop_forward
-    for i in xrange(1, length - stop_forward, 1):
-        if query[-i] != subject[-i]:
-            stop_reverse = length - i
-            break
-    # Do we detect a single mutation or insertion-deletion?
-    if stop_forward == stop_reverse:
-        mismatches = 1
-    else:
-        mismatches = 2
-    return mismatches
-
-
 def main():
     """
     """
     # Parse command line options.
     input_file = option_parse()
-    threshold = 1
 
     # Build a list of amplicons and count nucleotide occurences
     amplicons, order = parse_input_file(input_file)
 
     # Start swarming
     for seed in order:
-        
+
         amplicon = amplicons[seed]
-        
         if not amplicon[2]:  # Skip amplicons already swarmed
             continue
 
@@ -159,7 +118,13 @@ def main():
 
         # Which of these microvariants are in our dataset?
         hits = [microvariant for microvariant in microvariants
-                if microvariant in amplicons and amplicons[microvariant][2]]
+                if microvariant in amplicons
+                and amplicons[microvariant][2]]  # WARNING! for the
+                                                 # post-processing,
+                                                 # these hits would
+                                                 # need to be sorted
+                                                 # by decreasing
+                                                 # abundance!
 
         # Add them to the swarm (if any)
         if not hits:  # Singleton, go to the next master seed
@@ -178,7 +143,16 @@ def main():
                 # Search for k-seeds
                 microvariants = produce_microvariants(subseed)
                 hits = [microvariant for microvariant in microvariants
-                        if microvariant in amplicons and amplicons[microvariant][2]]
+                        if microvariant in amplicons
+                        and amplicons[microvariant][2]]   # WARNING!
+                                                          # for the
+                                                          # post-processing,
+                                                          # these hits
+                                                          # would need
+                                                          # to be
+                                                          # sorted by
+                                                          # decreasing
+                                                          # abundance!
                 if not hits:  # subseed has no sons
                     continue
                 nextseeds.extend(hits)
@@ -189,9 +163,7 @@ def main():
                 print(" ".join(swarm), file=sys.stdout)
                 break
             all_subseeds.append(nextseeds)
-    else:
-        # Deal with the end of the amplicon list
-        print(" ".join(swarm), file=sys.stdout)
+
     return
 
 
@@ -206,6 +178,7 @@ if __name__ == '__main__':
     main()
 
 sys.exit(0)
+
 
 # Profiling
 # ---------
@@ -225,12 +198,11 @@ sys.exit(0)
 #  5 2
 # 56 1
 
-# The next step is to introduce 3-mer and 4-mer, to evaluate the number
-# of 5-mer comparisons avoided. I also tried using 6-mers and it yielded
-# a 10 s gain (34 s to run). The future is maybe to compute 6-mer
-# vectors or 7-mers vectors when needed to keep avoiding the cost of a
-# Needleman-Wunsch alignment.
 
-# Finally, I need a faster Needleman-Wunsch implementation. I can do my
-# own C version with python bindings, or wait for Torbjørn's version
-# prepared by Umer.
+
+# The remaining questions are:
+# - how fast can we produce the microvariants (we have to do it for (n-1) of the n sequences)?
+# - what are the most efficient mapping implementations to get items?
+
+# The number of mapping queries will be (n - 1) * 8 *
+# average__sequence_length (example: 33 billion lookups for TARA V9). Hence, we have a O(n) complexity!
