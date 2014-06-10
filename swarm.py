@@ -72,29 +72,33 @@ def produce_microvariants(seq):
     seq2 = seq
     seq = list(seq)
     length = len(seq)
-    microvariants = list()
+    microvariants = set()
     # Insertions
-    for i in xrange(0, length + 1, 1):
-        # insert once, change three times
+    for i in xrange(0, length, 1):
+        # insert once (costly), change four times (cheap)
         tmp = seq[:]
-        tmp.insert(i, nucleotides[0])
-        microvariants.append("".join(tmp))
-        for nuc in nucleotides[1:]:
-            tmp[i] = nuc
-            microvariants.append("".join(tmp))
+        tmp.insert(i, "")
+        for nuc in nucleotides:
+            if tmp[i+1] != nuc:
+                tmp[i] = nuc
+                microvariants.add("".join(tmp))
+    # Insertions at the last position
+    for nuc in nucleotides:
+        tmp = seq[:] + [nuc]
+        microvariants.add("".join(tmp))
     # Mutations and deletions
     for i in xrange(0, length, 1):
         tmp = seq[:]
         for nuc in nucleotides:
-            tmp[i] = nuc
-            microvariants.append("".join(tmp))
+            if tmp[i] != nuc:
+                tmp[i] = nuc
+                microvariants.add("".join(tmp))
         del tmp[i]
-        microvariants.append("".join(tmp))
-    # Cleaning
-    microvariants = list(set(microvariants))
-    del microvariants[microvariants.index(seq2)]
-    print(str(length), len(microvariants), sep="\t", file=sys.stderr)
+        microvariants.add("".join(tmp))
+    # Remove the mother sequence from the set
+    microvariants.discard(seq2)
     return microvariants
+
 
 def main():
     """
