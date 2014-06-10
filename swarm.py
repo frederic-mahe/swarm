@@ -68,31 +68,33 @@ def produce_microvariants(seq):
     Some micro-variants are identical to the mother sequence: remove
     them.
     """
-    nucleotides = ["a", "c", "g", "t"]
+    nucleotides = tuple(["a", "c", "g", "t"])
+    seq2 = seq
     seq = list(seq)
     length = len(seq)
     microvariants = list()
     # Insertions
     for i in xrange(0, length + 1, 1):
-        for nuc in nucleotides:
-            microvariants.append("".join(seq[0:i] + [nuc] + seq[i:]))
-    # Mutations
-    for i in xrange(0, length, 1):
-        for nuc in nucleotides:
-            tmp = seq[:]
+        # insert once, change three times
+        tmp = seq[:]
+        tmp.insert(i, nucleotides[0])
+        microvariants.append("".join(tmp))
+        for nuc in nucleotides[1:]:
             tmp[i] = nuc
             microvariants.append("".join(tmp))
-    # Deletions
+    # Mutations and deletions
     for i in xrange(0, length, 1):
         tmp = seq[:]
+        for nuc in nucleotides:
+            tmp[i] = nuc
+            microvariants.append("".join(tmp))
         del tmp[i]
         microvariants.append("".join(tmp))
     # Cleaning
     microvariants = list(set(microvariants))
-    seq = "".join(seq)
-    del microvariants[microvariants.index(seq)]
+    del microvariants[microvariants.index(seq2)]
+    print(str(length), len(microvariants), sep="\t", file=sys.stderr)
     return microvariants
-
 
 def main():
     """
