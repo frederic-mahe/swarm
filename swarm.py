@@ -207,3 +207,5 @@ sys.exit(0)
 #  4 3
 #  5 2
 # 56 1
+
+# Note: using tuples instead of strings does not change the global speed
