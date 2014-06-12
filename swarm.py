@@ -64,7 +64,7 @@ def produce_microvariants(seq):
     micro-variants with one difference (mutation, insertion,
     deletion).
     """
-    nucleotides = tuple(["a", "c", "g", "t"])
+    nucleotides = ("a", "c", "g", "t")
     seq2 = seq
     seq = list(seq)
     length = len(seq)
