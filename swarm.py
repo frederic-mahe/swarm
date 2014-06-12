@@ -58,6 +58,7 @@ def parse_input_file(input_file):
             order.append(str(record.seq))
     return amplicons, order
 
+
 def produce_microvariants(seq):
     """
     For a given sequence, produce without repetition all possible
@@ -65,7 +66,6 @@ def produce_microvariants(seq):
     deletion).
     """
     nucleotides = ("a", "c", "g", "t")
-    seq2 = seq
     seq = list(seq)
     length = len(seq)
     microvariants = list()
@@ -87,7 +87,8 @@ def produce_microvariants(seq):
         tmp = seq[:]
         initial = tmp[i]
         for nuc in nucleotides:
-            if initial is not nuc:  # Avoid recreating the initial sequence
+            if initial is not nuc:  # Avoid recreating the initial
+                                    # sequence
                 tmp[i] = nuc
                 microvariants.append("".join(tmp))
         # Restore the initial sequence
@@ -206,12 +207,3 @@ sys.exit(0)
 #  4 3
 #  5 2
 # 56 1
-
-
-
-# The remaining questions are:
-# - how fast can we produce the microvariants (we have to do it for (n-1) of the n sequences)?
-# - what are the most efficient mapping implementations to get items?
-
-# The number of mapping queries will be (n - 1) * 8 *
-# average__sequence_length (example: 33 billion lookups for TARA V9). Hence, we have a O(n) complexity!
