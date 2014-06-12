@@ -58,45 +58,48 @@ def parse_input_file(input_file):
             order.append(str(record.seq))
     return amplicons, order
 
-
 def produce_microvariants(seq):
     """
     For a given sequence, produce without repetition all possible
     micro-variants with one difference (mutation, insertion,
     deletion).
-
-    Some micro-variants are identical to the mother sequence: remove
-    them.
     """
     nucleotides = tuple(["a", "c", "g", "t"])
     seq2 = seq
     seq = list(seq)
     length = len(seq)
-    microvariants = set()
+    microvariants = list()
     # Insertions
     for i in xrange(0, length, 1):
         # insert once (costly), change four times (cheap)
         tmp = seq[:]
         tmp.insert(i, "")
         for nuc in nucleotides:
-            if tmp[i+1] != nuc:
+            if tmp[i+1] is not nuc:
                 tmp[i] = nuc
-                microvariants.add("".join(tmp))
+                microvariants.append("".join(tmp))
     # Insertions at the last position
     for nuc in nucleotides:
         tmp = seq[:] + [nuc]
-        microvariants.add("".join(tmp))
+        microvariants.append("".join(tmp))
     # Mutations and deletions
     for i in xrange(0, length, 1):
         tmp = seq[:]
+        initial = tmp[i]
         for nuc in nucleotides:
-            if tmp[i] != nuc:
+            if initial is not nuc:  # Avoid recreating the initial sequence
                 tmp[i] = nuc
-                microvariants.add("".join(tmp))
-        del tmp[i]
-        microvariants.add("".join(tmp))
-    # Remove the mother sequence from the set
-    microvariants.discard(seq2)
+                microvariants.append("".join(tmp))
+        # Restore the initial sequence
+        tmp[i] = initial
+        # Deletion (only if nucleotides don't form a pair)
+        try:
+            if tmp[i] is not tmp[i+1]:
+                del tmp[i]
+                microvariants.append("".join(tmp))
+        except IndexError:  # Deletion at the last position
+            del tmp[i]
+            microvariants.append("".join(tmp))
     return microvariants
 
 
