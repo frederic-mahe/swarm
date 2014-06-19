@@ -8,11 +8,12 @@
 from __future__ import print_function
 
 __author__ = "Frédéric Mahé <mahe@rhrk.uni-kl.fr>"
-__date__ = "2014/06/07"
+__date__ = "2014/06/19"
 __version__ = "$Revision: 6.0"
 
 import sys
 from Bio import SeqIO
+from operator import itemgetter
 from optparse import OptionParser
 
 #*****************************************************************************#
@@ -39,8 +40,14 @@ def option_parse():
                       dest="input_file",
                       help="set <FILENAME> as input fasta file.")
 
+    parser.add_option("-b", "--breaker",
+                      action="store_true",
+                      dest="output_pairwise",
+                      default=False,
+                      help="Output pairwise relations.")
+
     (options, args) = parser.parse_args()
-    return options.input_file
+    return options.input_file, options.output_pairwise
 
 
 def parse_input_file(input_file):
@@ -52,8 +59,9 @@ def parse_input_file(input_file):
     order = list()
     with open(input_file, "rU") as input_file:
         for record in SeqIO.parse(input_file, input_format):
+            # Store 0) amplicon_id, 1) amplicon abundance, 2) amplicon status
             amplicons[str(record.seq)] = [record.id,
-                                          len(record.seq),
+                                          int(record.id.split("_")[1]),
                                           True]
             order.append(str(record.seq))
     return amplicons, order
@@ -71,10 +79,9 @@ def produce_microvariants(seq):
     microvariants = list()
     # Insertions
     for i in xrange(0, length, 1):
-        # insert once (costly), change four times (cheap)
         tmp = seq[:]
-        tmp.insert(i, "")
-        for nuc in nucleotides:
+        tmp.insert(i, "")  # insert once (costly)
+        for nuc in nucleotides:  # change four times (cheap)
             if tmp[i+1] is not nuc:
                 tmp[i] = nuc
                 microvariants.append("".join(tmp))
@@ -87,15 +94,13 @@ def produce_microvariants(seq):
         tmp = seq[:]
         initial = tmp[i]
         for nuc in nucleotides:
-            if initial is not nuc:  # Avoid recreating the initial
-                                    # sequence
+            if initial is not nuc:  # Avoid useless mutations
                 tmp[i] = nuc
                 microvariants.append("".join(tmp))
-        # Restore the initial sequence
-        tmp[i] = initial
-        # Deletion (only if nucleotides don't form a pair)
+        tmp[i] = initial  # Restore the initial sequence
+        # Deletions
         try:
-            if tmp[i] is not tmp[i+1]:
+            if tmp[i] is not tmp[i+1]:  # delete at the end of homopolymers
                 del tmp[i]
                 microvariants.append("".join(tmp))
         except IndexError:  # Deletion at the last position
@@ -108,7 +113,7 @@ def main():
     """
     """
     # Parse command line options.
-    input_file = option_parse()
+    input_file, output_pairwise = option_parse()
 
     # Build a list of amplicons and count nucleotide occurences
     amplicons, order = parse_input_file(input_file)
@@ -120,6 +125,7 @@ def main():
         if not amplicon[2]:  # Skip amplicons already swarmed
             continue
 
+        # Seed id and status
         swarm = [amplicon[0]]
         amplicons[seed][2] = False
 
@@ -127,22 +133,29 @@ def main():
         microvariants = produce_microvariants(seed)
 
         # Which of these microvariants are in our dataset?
-        hits = [microvariant for microvariant in microvariants
+        hits = [(microvariant, amplicons[microvariant][1])
+                for microvariant in microvariants
                 if microvariant in amplicons
-                and amplicons[microvariant][2]]  # WARNING! for the
-                                                 # post-processing,
-                                                 # these hits would
-                                                 # need to be sorted
-                                                 # by decreasing
-                                                 # abundance!
+                and amplicons[microvariant][2]]
 
-        # Add them to the swarm (if any)
-        if not hits:  # Singleton, go to the next master seed
+        # Isolated seed? close the swarm
+        if not hits:
             print(" ".join(swarm), file=sys.stdout)
             continue
-        swarm.extend([amplicons[j][0] for j in hits])
+
+        # Sort by decreasing abundance and remove abundance values
+        hits.sort(key=itemgetter(1, 0), reverse=True)
+        hits = map(itemgetter(0), hits)
+
+        # Add them to the swarm and update their status
+        swarm.extend([amplicons[hit][0] for hit in hits])
         for hit in hits:
             amplicons[hit][2] = False
+
+        if output_pairwise:  # Swarm breaker option activated
+            for hit in hits:
+                print("@@", amplicon[0], amplicons[hit][0], "1",
+                      sep="\t", file=sys.stderr)
 
         # Work on subseeds
         all_subseeds = [hits]
@@ -152,23 +165,29 @@ def main():
                 amplicons[subseed][2] = False
                 # Search for k-seeds
                 microvariants = produce_microvariants(subseed)
-                hits = [microvariant for microvariant in microvariants
+                hits = [(microvariant, amplicons[microvariant][1])
+                        for microvariant in microvariants
                         if microvariant in amplicons
-                        and amplicons[microvariant][2]]   # WARNING!
-                                                          # for the
-                                                          # post-processing,
-                                                          # these hits
-                                                          # would need
-                                                          # to be
-                                                          # sorted by
-                                                          # decreasing
-                                                          # abundance!
-                if not hits:  # subseed has no sons
+                        and amplicons[microvariant][2]]
+
+                if not hits:  # subseed has no son
                     continue
+
+                # Sort by decreasing abundance and remove abundance values
+                hits.sort(key=itemgetter(1, 0), reverse=True)
+                hits = map(itemgetter(0), hits)
                 nextseeds.extend(hits)
+
+                # Add them to the swarm and update their status
                 swarm.extend([amplicons[hit][0] for hit in hits])
                 for hit in hits:
                     amplicons[hit][2] = False
+
+                if output_pairwise:  # Swarm breaker option activated
+                    for hit in hits:
+                        print("@@", amplicon[0], amplicons[hit][0], "1",
+                              sep="\t", file=sys.stderr)
+
             if not nextseeds:  # No new subseeds
                 print(" ".join(swarm), file=sys.stdout)
                 break
