@@ -207,24 +207,3 @@ if __name__ == '__main__':
     main()
 
 sys.exit(0)
-
-
-# Profiling
-# ---------
-#
-# python -m cProfile swarm.py -i ../examples/AF091148.fas > tmp
-#
-# Expected results
-# ----------------
-#
-# time python swarm.py -i ../examples/AF091148.fas | awk '{print NF}' | sort -nr | uniq -c
-#  1 878
-#  1 423
-#  1 15
-#  1 5
-#  1 4
-#  4 3
-#  5 2
-# 56 1
-
-# Note: using tuples instead of strings does not change the global speed
