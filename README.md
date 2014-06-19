@@ -31,8 +31,8 @@ version would take several months on a 16-cores computer.
 
 Early tests with a C version of the key-function of the new algorithm
 show a 10 times speed-up. We can confidently estimate that a smart
-C/C++ re-implementation of the algorithm will bring a very significant
-speed-up.
+C/C++ re-implementation of the algorithm will bring another very
+significant speed-up.
 
 In conclusion, with that new swarm algorithm, fast, exact and accurate
 partitioning of extremely large datasets, intractable with current
