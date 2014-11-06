@@ -8,8 +8,8 @@
 from __future__ import print_function
 
 __author__ = "Frédéric Mahé <mahe@rhrk.uni-kl.fr>"
-__date__ = "2014/06/19"
-__version__ = "$Revision: 6.0"
+__date__ = "2014/11/06"
+__version__ = "$Revision: 7.0"
 
 import sys
 from Bio import SeqIO
@@ -111,6 +111,7 @@ def produce_microvariants(seq):
 
 def main():
     """
+    Load and parse input fasta file and clusterize it.
     """
     # Parse command line options.
     input_file, output_pairwise = option_parse()
@@ -125,18 +126,18 @@ def main():
         if not amplicon[2]:  # Skip amplicons already swarmed
             continue
 
-        # Seed id and status
+        # Seed id, abundance and status
         swarm = [amplicon[0]]
         amplicons[seed][2] = False
 
         # Create micro-variants
         microvariants = produce_microvariants(seed)
 
-        # Which of these microvariants are in our dataset?
+        # Which of these microvariants are in our dataset? 
         hits = [(microvariant, amplicons[microvariant][1])
                 for microvariant in microvariants
                 if microvariant in amplicons
-                and amplicons[microvariant][2]]
+                and amplicons[microvariant][2]]  # No check abundance here
 
         # Isolated seed? close the swarm
         if not hits:
@@ -162,13 +163,15 @@ def main():
         for subseeds in all_subseeds:
             nextseeds = list()
             for subseed in subseeds:
+                subseed_abundance = amplicons[subseed][1]
                 amplicons[subseed][2] = False
-                # Search for k-seeds
+                # Search for k-seeds (discard hits with higher abundance value)
                 microvariants = produce_microvariants(subseed)
                 hits = [(microvariant, amplicons[microvariant][1])
                         for microvariant in microvariants
                         if microvariant in amplicons
-                        and amplicons[microvariant][2]]
+                        and amplicons[microvariant][2]
+                        and amplicons[microvariant][1] <= subseed_abundance]
 
                 if not hits:  # subseed has no son
                     continue
