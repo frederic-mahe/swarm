@@ -133,11 +133,26 @@ def main():
         # Create micro-variants
         microvariants = produce_microvariants(seed)
 
-        # Which of these microvariants are in our dataset? 
+        # Output basic stats on microvariant first layer saturation
+        hits = [(microvariant, amplicons[microvariant][1])
+                for microvariant in microvariants
+                if microvariant in amplicons]
+        seed_id = amplicons[seed][0].split("_")[0]
+        seed_abundance = amplicons[seed][1]
+        seed_length = len(seed)
+        n_microvariants = len(microvariants)
+        n_hits = len(hits)
+        n_missed = n_microvariants - n_hits
+        ratio = round(100.0 * n_hits / n_microvariants, 2)
+        print(seed_id, seed_abundance, seed_length, n_microvariants,
+              n_hits, n_missed, ratio, sep="\t", file=sys.stderr)
+
+        # Which of these microvariants are in our dataset?
         hits = [(microvariant, amplicons[microvariant][1])
                 for microvariant in microvariants
                 if microvariant in amplicons
-                and amplicons[microvariant][2]]  # No check abundance here
+                and amplicons[microvariant][2]]  # No need to check
+                                                 # abundance here
 
         # Isolated seed? close the swarm
         if not hits:
@@ -167,6 +182,22 @@ def main():
                 amplicons[subseed][2] = False
                 # Search for k-seeds (discard hits with higher abundance value)
                 microvariants = produce_microvariants(subseed)
+
+                # Output basic stats on microvariant first layer saturation
+                hits = [(microvariant, amplicons[microvariant][1])
+                        for microvariant in microvariants
+                        if microvariant in amplicons]
+                subseed_id = amplicons[subseed][0].split("_")[0]
+                subseed_abundance = amplicons[subseed][1]
+                subseed_length = len(subseed)
+                n_microvariants = len(microvariants)
+                n_hits = len(hits)
+                n_missed = n_microvariants - n_hits
+                ratio = round(100.0 * n_hits / n_microvariants, 2)
+                print(subseed_id, subseed_abundance, subseed_length, n_microvariants,
+                      n_hits, n_missed, ratio, sep="\t", file=sys.stderr)
+
+                # Which of these microvariants are in our dataset?
                 hits = [(microvariant, amplicons[microvariant][1])
                         for microvariant in microvariants
                         if microvariant in amplicons
