@@ -8,8 +8,8 @@
 from __future__ import print_function
 
 __author__ = "Frédéric Mahé <mahe@rhrk.uni-kl.fr>"
-__date__ = "2014/11/06"
-__version__ = "$Revision: 7.0"
+__date__ = "2014/11/10"
+__version__ = "$Revision: 8.0"
 
 import sys
 from Bio import SeqIO
@@ -59,10 +59,13 @@ def parse_input_file(input_file):
     order = list()
     with open(input_file, "rU") as input_file:
         for record in SeqIO.parse(input_file, input_format):
-            # Store 0) amplicon_id, 1) amplicon abundance, 2) amplicon status
+            # Store 0) amplicon_id, 1) amplicon abundance, 2) amplicon
+            # status, 3) swarm mass, 4) swarm seed id
             amplicons[str(record.seq)] = [record.id,
                                           int(record.id.split("_")[1]),
-                                          True]
+                                          True,
+                                          0,
+                                          ""]
             order.append(str(record.seq))
     return amplicons, order
 
@@ -116,36 +119,29 @@ def main():
     # Parse command line options.
     input_file, output_pairwise = option_parse()
 
-    # Build a list of amplicons and count nucleotide occurences
+    # Build a dict of amplicons and a list to preserve input order
+    # (assuming decreasing abundance)
     amplicons, order = parse_input_file(input_file)
+
+    # Store each swarm created in a dictionary: swarm[seed] = list(amplicons)
+    swarms = dict()
+
+    # Phase 1: d = 1 clustering -----------------------------------------------
 
     # Start swarming
     for seed in order:
 
-        amplicon = amplicons[seed]
-        if not amplicon[2]:  # Skip amplicons already swarmed
+        seed_id, seed_abundance, seed_status = amplicons[seed][0:3]
+        if not seed_status:  # Skip amplicons already swarmed
             continue
 
-        # Seed id, abundance and status
-        swarm = [amplicon[0]]
-        amplicons[seed][2] = False
+        # Seed id and status
+        swarm = [seed_id]
+        amplicons[seed][2] = False  #  could be seed_status = False
+        amplicons[seed][4] = seed_id  # point to itself
 
         # Create micro-variants
         microvariants = produce_microvariants(seed)
-
-        # Output basic stats on microvariant first layer saturation
-        hits = [(microvariant, amplicons[microvariant][1])
-                for microvariant in microvariants
-                if microvariant in amplicons]
-        seed_id = amplicons[seed][0].split("_")[0]
-        seed_abundance = amplicons[seed][1]
-        seed_length = len(seed)
-        n_microvariants = len(microvariants)
-        n_hits = len(hits)
-        n_missed = n_microvariants - n_hits
-        ratio = round(100.0 * n_hits / n_microvariants, 2)
-        print(seed_id, seed_abundance, seed_length, n_microvariants,
-              n_hits, n_missed, ratio, sep="\t", file=sys.stderr)
 
         # Which of these microvariants are in our dataset?
         hits = [(microvariant, amplicons[microvariant][1])
@@ -156,48 +152,39 @@ def main():
 
         # Isolated seed? close the swarm
         if not hits:
-            print(" ".join(swarm), file=sys.stdout)
+            swarms[swarm[0]] = swarm
+            # Add mass information
+            amplicons[seed][3] = seed_abundance
             continue
 
-        # Sort by decreasing abundance and remove abundance values
+        # Sort by decreasing abundance
         hits.sort(key=itemgetter(1, 0), reverse=True)
-        hits = map(itemgetter(0), hits)
 
         # Add them to the swarm and update their status
-        swarm.extend([amplicons[hit][0] for hit in hits])
+        swarm.extend([amplicons[hit[0]][0] for hit in hits])
         for hit in hits:
-            amplicons[hit][2] = False
-
-        if output_pairwise:  # Swarm breaker option activated
-            for hit in hits:
-                print("@@", amplicon[0], amplicons[hit][0], "1",
+            hit_seq = hit[0]
+            amplicons[hit_seq][2] = False
+            amplicons[hit_seq][4] = seed_id  # point to swarm seed
+            if output_pairwise:  # Swarm breaker option activated
+                print("@@", seed_id, amplicons[hit_seq][0], "1",
                       sep="\t", file=sys.stderr)
 
-        # Work on subseeds
+        # Work on subseeds (also save a list of hits along the way)
+        all_hits = [(seed, seed_abundance)]
         all_subseeds = [hits]
+        all_hits.extend(hits)
         for subseeds in all_subseeds:
             nextseeds = list()
             for subseed in subseeds:
-                subseed_abundance = amplicons[subseed][1]
-                amplicons[subseed][2] = False
-                # Search for k-seeds (discard hits with higher abundance value)
-                microvariants = produce_microvariants(subseed)
-
-                # Output basic stats on microvariant first layer saturation
-                hits = [(microvariant, amplicons[microvariant][1])
-                        for microvariant in microvariants
-                        if microvariant in amplicons]
-                subseed_id = amplicons[subseed][0].split("_")[0]
-                subseed_abundance = amplicons[subseed][1]
-                subseed_length = len(subseed)
-                n_microvariants = len(microvariants)
-                n_hits = len(hits)
-                n_missed = n_microvariants - n_hits
-                ratio = round(100.0 * n_hits / n_microvariants, 2)
-                print(subseed_id, subseed_abundance, subseed_length, n_microvariants,
-                      n_hits, n_missed, ratio, sep="\t", file=sys.stderr)
+                subseed_seq, subseed_abundance = subseed[0], subseed[1]
+                # Update subseed status
+                amplicons[subseed_seq][2] = False
+                # Produce all microvariants of subseed
+                microvariants = produce_microvariants(subseed_seq)
 
                 # Which of these microvariants are in our dataset?
+                # (discard hits with higher abundance value)
                 hits = [(microvariant, amplicons[microvariant][1])
                         for microvariant in microvariants
                         if microvariant in amplicons
@@ -207,25 +194,38 @@ def main():
                 if not hits:  # subseed has no son
                     continue
 
-                # Sort by decreasing abundance and remove abundance values
+                # Sort by decreasing abundance
                 hits.sort(key=itemgetter(1, 0), reverse=True)
-                hits = map(itemgetter(0), hits)
-                nextseeds.extend(hits)
+                nextseeds.extend(hits)  # HITS ARE NOT GLOBALLY SORTED
+                                        # BY DECREASING
+                                        # ABUNDANCE. POSSIBLE SOURCE
+                                        # OF CLUSTERING VARIATION?
 
-                # Add them to the swarm and update their status
-                swarm.extend([amplicons[hit][0] for hit in hits])
+                # Add hits to the swarm and update their status
+                swarm.extend([amplicons[hit[0]][0] for hit in hits])
+                all_hits.extend(hits)
                 for hit in hits:
-                    amplicons[hit][2] = False
-
-                if output_pairwise:  # Swarm breaker option activated
-                    for hit in hits:
-                        print("@@", amplicon[0], amplicons[hit][0], "1",
+                    hit_seq = hit[0]
+                    amplicons[hit_seq][2] = False
+                    amplicons[hit_seq][4] = seed_id  # point to swarm seed
+                    if output_pairwise:  # Swarm breaker option activated
+                        print("@@", amplicons[subseed_seq][0],
+                              amplicons[hit_seq][0], "1",
                               sep="\t", file=sys.stderr)
-
-            if not nextseeds:  # No new subseeds
-                print(" ".join(swarm), file=sys.stdout)
+            
+            if not nextseeds:  # No new subseeds, end of the all_subseeds list
+                swarms[swarm[0]] = swarm  # Memorize the swarm
+                mass = sum([hit[1] for hit in all_hits])
+                for hit in all_hits:  # Set swarm mass value for each amplicon
+                    amplicons[hit[0]][3] = mass
                 break
             all_subseeds.append(nextseeds)
+
+    # Output swarms (d = 1)
+    for seed in order:
+        seed_id = amplicons[seed][0]
+        if seed_id in swarms:
+            print(" ".join(swarms[seed_id]), file=sys.stdout)        
 
     return
 
