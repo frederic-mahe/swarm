@@ -11,6 +11,7 @@ __author__ = "Frédéric Mahé <mahe@rhrk.uni-kl.fr>"
 __date__ = "2014/11/10"
 __version__ = "$Revision: 8.0"
 
+import os
 import sys
 from Bio import SeqIO
 from operator import itemgetter
@@ -59,15 +60,31 @@ def parse_input_file(input_file):
     order = list()
     with open(input_file, "rU") as input_file:
         for record in SeqIO.parse(input_file, input_format):
+            seq = str(record.seq).lower()  # Convert all sequences to lowercase
             # Store 0) amplicon_id, 1) amplicon abundance, 2) amplicon
             # status, 3) swarm mass, 4) swarm seed id
-            amplicons[str(record.seq)] = [record.id,
-                                          int(record.id.split("_")[1]),
-                                          True,
-                                          0,
-                                          ""]
-            order.append(str(record.seq))
+            amplicons[seq] = [record.id,
+                              int(record.id.split("_")[1]),
+                              True,
+                              0,
+                              ""]
+            order.append(seq)
     return amplicons, order
+
+
+def output_swarms(input_file, order, amplicons, swarms, d):
+    """
+    Write swarms to a file
+    """
+    # Create new file name
+    extension = "_" + str(d) + ".swarms_2_prototype"
+    output_file = os.path.splitext(os.path.abspath(input_file))[0] + extension
+    with open(output_file, "w") as output_file:
+        for seed in order:
+            seed_id = amplicons[seed][0]
+            if seed_id in swarms:
+                print(" ".join(swarms[seed_id]), file=output_file)
+    return
 
 
 def produce_microvariants(seq):
@@ -137,7 +154,7 @@ def main():
 
         # Seed id and status
         swarm = [seed_id]
-        amplicons[seed][2] = False  #  could be seed_status = False
+        amplicons[seed][2] = False  # could be seed_status = False
         amplicons[seed][4] = seed_id  # point to itself
 
         # Create micro-variants
@@ -212,7 +229,7 @@ def main():
                         print("@@", amplicons[subseed_seq][0],
                               amplicons[hit_seq][0], "1",
                               sep="\t", file=sys.stderr)
-            
+
             if not nextseeds:  # No new subseeds, end of the all_subseeds list
                 swarms[swarm[0]] = swarm  # Memorize the swarm
                 mass = sum([hit[1] for hit in all_hits])
@@ -222,10 +239,64 @@ def main():
             all_subseeds.append(nextseeds)
 
     # Output swarms (d = 1)
+    output_swarms(input_file, order, amplicons, swarms, 1)
+
+    # Phase 2: d = 2 clustering -----------------------------------------------
+
+    # The process seems to detect the same candidates many times. I
+    # need to mark the sequences already seen to get a more precise
+    # evaluation of the dynamic of recruitment. After the first phase,
+    # all amplicons are marked as False. I can re-use that data
+    # structure to my advantage.
+
+    # Number of OTUs
+    n_OTUs = len(swarms)
+
     for seed in order:
-        seed_id = amplicons[seed][0]
-        if seed_id in swarms:
-            print(" ".join(swarms[seed_id]), file=sys.stdout)        
+        captured_OTUs = 0
+        seed_id, seed_abundance, seed_status, swarm_mass, main_seed = amplicons[seed]
+
+        # Do not deal with rare amplicons
+        if seed_abundance == 2:
+            break
+
+        # Create micro-variants
+        microvariants = produce_microvariants(seed)
+
+        # Which of these microvariants are not in our dataset?
+        fails = [microvariant
+                 for microvariant in microvariants
+                 if microvariant not in amplicons]
+
+        for fail in fails:
+            microvariants_2d = produce_microvariants(fail)
+
+            # Which of these microvariants are not in our dataset?
+            # OTUs of size 2 or less are dust.
+            hits = [(microvariant, amplicons[microvariant])
+                    for microvariant in microvariants_2d
+                    if microvariant in amplicons
+                    and amplicons[microvariant][3] <= 2
+                    and amplicons[microvariant][2] is False]
+
+            # Add hits to the swarm to which the seed belongs
+            for hit in hits:
+                amplicons[hit[0]][2] = True
+                hit_id, hit_pointer = hit[1][0], hit[1][4]
+                if hit_pointer in swarms:
+                    swarms[main_seed] += swarms[hit_pointer]
+                    del swarms[hit_pointer]
+                    captured_OTUs += 1
+
+        # Basic stats
+        n_OTUs -= captured_OTUs
+        print(main_seed, seed_id, seed_abundance,
+              len(seed), len(microvariants),
+              len(fails), captured_OTUs, n_OTUs,
+              file=sys.stderr)
+
+    # Output swarms (d = 2)
+    output_swarms(input_file, order, amplicons, swarms, 2)
 
     return
 
@@ -241,3 +312,12 @@ if __name__ == '__main__':
     main()
 
 sys.exit(0)
+
+## TODO
+# the algorithm could be simplified instead of adding the mass values
+# to the amplicons, I added it to the swarms dict. It would cost a
+# look up in the amplicons dict first to get the swarm seed, then a
+# look up in the swarms dict to get the mass of the swarm.
+# 
+# During the second step, the mass values should be updated?? Not sure
+# it is usefull.
