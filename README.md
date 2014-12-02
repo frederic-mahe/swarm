@@ -10,24 +10,25 @@ default in the official swarm version, as it yields high-resolution
 clustering results, and as datasets grow in size, using *d* = 1 is
 arguably the best decision.
 
-With current clustering algorithms, the computation complexity is
-**quadratic**. Multiplying by 10 the size of the dataset increases by a
-factor 100 the computation time.
+With current clustering algorithms (including swarm), computation
+complexity is **quadratic**. Multiplying by 10 the size of the dataset
+increases by a factor 100 the computation time.
 
-In swarm, using a fixed *d* = 1 value allows a radical change in the
-algorithm design (while of course remaining exact). That new
-algorithm, implemented in the python script presented here, has a
-fantastic property: it has a **linear** computation
+In the approach taken by swarm, using a fixed *d* = 1 value allows a
+radical change in the algorithm design (while of course remaining
+exact). That new algorithm, implemented in the python script presented
+here, has a fantastic property: it has a **linear** computation
 complexity. Increasing the dataset 10 times only increases the
 computation time by a factor of 10. A major change in scalability.
 
 To give some perspective, the monothreaded python script is already as
-fast as the C++ multithreaded implementation of swarm on mid-size
-amplicon datasets (appr. 1 million unique amplicons). The python
-script is more than 10 times faster on large amplicon datasets (32
-million unique amplicons). On an extremely large dataset (154 million
-unique amplicons!), the script takes only 6 days to run, where the C++
-version would take several months on a 16-cores computer.
+fast as the C++ multithreaded "vanilla" implementation of swarm on
+mid-size amplicon datasets (appr. 1 million unique amplicons). The
+python script is more than 10 times faster on large amplicon datasets
+(32 million unique amplicons). On an extremely large dataset (154
+million unique amplicons!), the script takes only 6 days to run, where
+the C++ vanilla implementation of swarm would take several months on a
+16-cores computer.
 
 Early tests with a C version of the key-function of the new algorithm
 show a 10 times speed-up. We can confidently estimate that a smart
