@@ -41,14 +41,15 @@ def option_parse():
                       dest="input_file",
                       help="set <FILENAME> as input fasta file.")
 
-    parser.add_option("-b", "--breaker",
-                      action="store_true",
-                      dest="output_pairwise",
-                      default=False,
-                      help="Output pairwise relations.")
+    parser.add_option("-b", "--boundary",
+                      action="store",
+                      type="int",
+                      dest="boundary",
+                      default=2,
+                      help="Frontier between abundant/rare amplicons.")
 
     (options, args) = parser.parse_args()
-    return options.input_file, options.output_pairwise
+    return options.input_file, options.boundary
 
 
 def parse_input_file(input_file):
@@ -60,7 +61,7 @@ def parse_input_file(input_file):
     order = list()
     with open(input_file, "rU") as input_file:
         for record in SeqIO.parse(input_file, input_format):
-            seq = str(record.seq).lower()  # Convert all sequences to lowercase
+            seq = str(record.seq).lower()  # Convert all sequences to lowercase.
             # Store 0) amplicon_id, 1) amplicon abundance, 2) amplicon
             # status, 3) swarm mass, 4) swarm seed id
             amplicons[seq] = [record.id,
@@ -134,7 +135,7 @@ def main():
     Load and parse input fasta file and clusterize it.
     """
     # Parse command line options.
-    input_file, output_pairwise = option_parse()
+    input_file, boundary = option_parse()
 
     # Build a dict of amplicons and a list to preserve input order
     # (assuming decreasing abundance)
@@ -183,9 +184,6 @@ def main():
             hit_seq = hit[0]
             amplicons[hit_seq][2] = False
             amplicons[hit_seq][4] = seed_id  # point to swarm seed
-            if output_pairwise:  # Swarm breaker option activated
-                print("@@", seed_id, amplicons[hit_seq][0], "1",
-                      sep="\t", file=sys.stderr)
 
         # Work on subseeds (also save a list of hits along the way)
         all_hits = [(seed, seed_abundance)]
@@ -225,10 +223,6 @@ def main():
                     hit_seq = hit[0]
                     amplicons[hit_seq][2] = False
                     amplicons[hit_seq][4] = seed_id  # point to swarm seed
-                    if output_pairwise:  # Swarm breaker option activated
-                        print("@@", amplicons[subseed_seq][0],
-                              amplicons[hit_seq][0], "1",
-                              sep="\t", file=sys.stderr)
 
             if not nextseeds:  # No new subseeds, end of the all_subseeds list
                 swarms[swarm[0]] = swarm  # Memorize the swarm
@@ -257,7 +251,7 @@ def main():
         seed_id, seed_abundance, seed_status, swarm_mass, main_seed = amplicons[seed]
 
         # Do not deal with rare amplicons
-        if seed_abundance == 2:
+        if seed_abundance == boundary:
             break
 
         # Create micro-variants
@@ -272,11 +266,11 @@ def main():
             microvariants_2d = produce_microvariants(fail)
 
             # Which of these microvariants are not in our dataset?
-            # OTUs of size 2 or less are dust.
+            # OTUs of size 2 or less are dust (boundary).
             hits = [(microvariant, amplicons[microvariant])
                     for microvariant in microvariants_2d
                     if microvariant in amplicons
-                    and amplicons[microvariant][3] <= 2
+                    and amplicons[microvariant][3] <= boundary
                     and amplicons[microvariant][2] is False]
 
             # Add hits to the swarm to which the seed belongs
