@@ -25,11 +25,10 @@ from optparse import OptionParser
 
 
 def option_parse():
-    """
-    Parse arguments from command line.
-    """
+    """Parse arguments from command line."""
     desc = """Find clusters of nearly identical amplicons in giant
-    amplicon-based environmental or clinical projects."""
+    amplicon-based environmental or clinical projects. Amplicons are
+    expected to be sorted by decreasing abundance."""
 
     parser = OptionParser(usage="usage: %prog --input_file filename",
                           description=desc,
@@ -53,13 +52,11 @@ def option_parse():
 
 
 def parse_input_file(input_file):
-    """
-    Build a list of amplicons
-    """
+    """Build a list of amplicons."""
     input_format = "fasta"
     amplicons = dict()
     order = list()
-    with open(input_file, "rU") as input_file:
+    with open(input_file, "rb") as input_file:
         for record in SeqIO.parse(input_file, input_format):
             seq = str(record.seq).lower()  # Convert all sequences to lowercase.
             # Store 0) amplicon_id, 1) amplicon abundance, 2) amplicon
@@ -74,9 +71,7 @@ def parse_input_file(input_file):
 
 
 def output_swarms(input_file, order, amplicons, swarms, d):
-    """
-    Write swarms to a file
-    """
+    """Write swarms to a file."""
     # Create new file name
     extension = "_" + str(d) + ".swarms_2_prototype"
     output_file = os.path.splitext(os.path.abspath(input_file))[0] + extension
@@ -89,10 +84,11 @@ def output_swarms(input_file, order, amplicons, swarms, d):
 
 
 def produce_microvariants(seq):
-    """
-    For a given sequence, produce without repetition all possible
-    micro-variants with one difference (mutation, insertion,
-    deletion).
+    """Produce all possible micro-variants, without repetition.
+
+    The original sequence must be made exclusively of lowercase
+    nucleotides (acgt). Micro-variants have one difference
+    (substitution, insertion, or deletion) with the original sequence.
     """
     nucleotides = ("a", "c", "g", "t")
     seq = list(seq)
@@ -131,9 +127,7 @@ def produce_microvariants(seq):
 
 
 def main():
-    """
-    Load and parse input fasta file and clusterize it.
-    """
+    """Load and parse input fasta file and clusterize it."""
     # Parse command line options.
     input_file, boundary = option_parse()
 
@@ -211,10 +205,8 @@ def main():
 
                 # Sort by decreasing abundance
                 hits.sort(key=itemgetter(1, 0), reverse=True)
-                nextseeds.extend(hits)  # HITS ARE NOT GLOBALLY SORTED
-                                        # BY DECREASING
-                                        # ABUNDANCE. POSSIBLE SOURCE
-                                        # OF CLUSTERING VARIATION?
+                nextseeds.extend(hits)  # Hits in nextseeds are not globally
+                                        # sorted at that point
 
                 # Add hits to the swarm and update their status
                 swarm.extend([amplicons[hit[0]][0] for hit in hits])
@@ -230,6 +222,8 @@ def main():
                 for hit in all_hits:  # Set swarm mass value for each amplicon
                     amplicons[hit[0]][3] = mass
                 break
+            # Hits in nextseeds are globally sorted (each layer of microvariant is sorted by decreasing abundance)
+            nextseeds.sort(key=itemgetter(1, 0), reverse=True)
             all_subseeds.append(nextseeds)
 
     # Output swarms (d = 1)
