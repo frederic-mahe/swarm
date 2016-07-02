@@ -62,7 +62,7 @@ def parse_input_file(input_file):
             # Store 0) amplicon_id, 1) amplicon abundance, 2) amplicon
             # status, 3) swarm mass, 4) swarm seed id
             amplicons[seq] = [record.id,
-                              int(record.id.split("_")[1]),
+                              int(record.id.split(";size=")[1]),
                               True,
                               0,
                               ""]
@@ -302,8 +302,8 @@ if __name__ == '__main__':
 sys.exit(0)
 
 ## TODO
-# the algorithm could be simplified instead of adding the mass values
-# to the amplicons, I added it to the swarms dict. It would cost a
+# the algorithm could be simplified if instead of adding mass values
+# to the amplicons, I added them to the swarms dict. It would cost a
 # look up in the amplicons dict first to get the swarm seed, then a
 # look up in the swarms dict to get the mass of the swarm.
 # 
