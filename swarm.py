@@ -94,14 +94,14 @@ def produce_microvariants(seq):
     seq = list(seq)
     length = len(seq)
     microvariants = list()
-    # Insertions
+    # Insertions (insert once, then shift)
+    tmp = [""] + seq[:]
     for i in xrange(0, length, 1):
-        tmp = seq[:]
-        tmp.insert(i, "")  # insert once (costly)
-        for nuc in nucleotides:  # change four times (cheap)
+        for nuc in nucleotides:
             if tmp[i+1] is not nuc:
                 tmp[i] = nuc
                 microvariants.append("".join(tmp))
+        tmp[i] = tmp[i+1]
     # Insertions at the last position
     for nuc in nucleotides:
         tmp = seq[:] + [nuc]
