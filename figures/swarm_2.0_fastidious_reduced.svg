@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -14,7 +12,7 @@
    height="334.75723"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.4 r9939"
+   inkscape:version="1.0.2 (e86c870879, 2021-01-15)"
    sodipodi:docname="swarm_2.0_fastidious_reduced.svg"
    inkscape:export-filename="/home/fred/Science/Projects/Swarms/figures/swarm_2.0_fastidious_reduced.png"
    inkscape:export-xdpi="150"
@@ -6235,25 +6233,26 @@
      pagecolor="#ffffff"
      bordercolor="#666666"
      borderopacity="1.0"
-     inkscape:pageopacity="0.0"
+     inkscape:pageopacity="1"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.094314"
-     inkscape:cx="542.51519"
-     inkscape:cy="286.47355"
+     inkscape:zoom="0.77234864"
+     inkscape:cx="468.1659"
+     inkscape:cy="283.78085"
      inkscape:document-units="px"
      inkscape:current-layer="layer2"
      showgrid="false"
      inkscape:window-width="1920"
-     inkscape:window-height="1014"
-     inkscape:window-x="0"
+     inkscape:window-height="2096"
+     inkscape:window-x="1920"
      inkscape:window-y="27"
-     inkscape:window-maximized="1"
+     inkscape:window-maximized="0"
      borderlayer="true"
      inkscape:showpageshadow="false"
      fit-margin-top="0"
      fit-margin-left="0"
      fit-margin-right="0"
-     fit-margin-bottom="0" />
+     fit-margin-bottom="0"
+     inkscape:document-rotation="0" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -6262,7 +6261,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -6430,7 +6429,7 @@
     <flowRoot
        xml:space="preserve"
        id="flowRoot4462"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Helvetica Neue LT Com;-inkscape-font-specification:Helvetica Neue LT Com"
+       style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0.01%;font-family:'Helvetica Neue LT Com';-inkscape-font-specification:'Helvetica Neue LT Com';text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-anchor:start;display:inline;overflow:visible;visibility:visible;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;enable-background:accumulate"
        transform="translate(-310.9121,-445.99916)"><flowRegion
          id="flowRegion4464"><rect
            id="rect4466"
@@ -6438,7 +6437,9 @@
            height="200.42303"
            x="-717.69135"
            y="782.737" /></flowRegion><flowPara
-         id="flowPara4468" /></flowRoot>    <path
+         id="flowPara4468"
+         style="font-size:40px;line-height:0"> </flowPara></flowRoot>
+    <path
        inkscape:connector-curvature="0"
        style="fill:none;stroke:#2d3680;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-opacity:0.50196078;stroke-dasharray:none;stroke-dashoffset:0"
        id="path7319-0"
@@ -6446,7 +6447,7 @@
     <flowRoot
        xml:space="preserve"
        id="flowRoot4462-2"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Helvetica Neue LT Com;-inkscape-font-specification:Helvetica Neue LT Com"
+       style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0.01%;font-family:'Helvetica Neue LT Com';-inkscape-font-specification:'Helvetica Neue LT Com';text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-anchor:start;display:inline;overflow:visible;visibility:visible;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;enable-background:accumulate"
        transform="translate(-3479.4802,-1873.9039)"><flowRegion
          id="flowRegion4464-2"><rect
            id="rect4466-2"
@@ -6454,7 +6455,9 @@
            height="200.42303"
            x="-717.69135"
            y="782.737" /></flowRegion><flowPara
-         id="flowPara4468-7" /></flowRoot>    <path
+         id="flowPara4468-7"
+         style="font-size:40px;line-height:0"> </flowPara></flowRoot>
+    <path
        inkscape:connector-curvature="0"
        style="fill:none;stroke:#2d3680;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-opacity:0.50196078;stroke-dasharray:none;stroke-dashoffset:0"
        id="path7319-7"
@@ -6462,7 +6465,7 @@
     <flowRoot
        xml:space="preserve"
        id="flowRoot4462-8"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Helvetica Neue LT Com;-inkscape-font-specification:Helvetica Neue LT Com"
+       style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0.01%;font-family:'Helvetica Neue LT Com';-inkscape-font-specification:'Helvetica Neue LT Com';text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-anchor:start;display:inline;overflow:visible;visibility:visible;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;enable-background:accumulate"
        transform="translate(-3973.7152,-383.86672)"><flowRegion
          id="flowRegion4464-9"><rect
            id="rect4466-1"
@@ -6470,7 +6473,9 @@
            height="200.42303"
            x="-717.69135"
            y="782.737" /></flowRegion><flowPara
-         id="flowPara4468-1" /></flowRoot>    <path
+         id="flowPara4468-1"
+         style="font-size:40px;line-height:0"> </flowPara></flowRoot>
+    <path
        inkscape:connector-curvature="0"
        style="fill:none;stroke:#2d3680;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-opacity:0.50196078;stroke-dasharray:none;stroke-dashoffset:0"
        id="path7319-0-9"
@@ -6478,7 +6483,7 @@
     <flowRoot
        xml:space="preserve"
        id="flowRoot4462-2-2"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Helvetica Neue LT Com;-inkscape-font-specification:Helvetica Neue LT Com"
+       style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0.01%;font-family:'Helvetica Neue LT Com';-inkscape-font-specification:'Helvetica Neue LT Com';text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-anchor:start;display:inline;overflow:visible;visibility:visible;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;enable-background:accumulate"
        transform="translate(-7142.2833,-1811.7714)"><flowRegion
          id="flowRegion4464-2-7"><rect
            id="rect4466-2-3"
@@ -6486,7 +6491,9 @@
            height="200.42303"
            x="-717.69135"
            y="782.737" /></flowRegion><flowPara
-         id="flowPara4468-7-2" /></flowRoot>    <path
+         id="flowPara4468-7-2"
+         style="font-size:40px;line-height:0"> </flowPara></flowRoot>
+    <path
        inkscape:connector-curvature="0"
        style="fill:none;stroke:#2d3680;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-opacity:0.50196078;stroke-dasharray:none;stroke-dashoffset:0"
        id="path7319-6"
@@ -6494,7 +6501,7 @@
     <flowRoot
        xml:space="preserve"
        id="flowRoot4462-5"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Helvetica Neue LT Com;-inkscape-font-specification:Helvetica Neue LT Com"
+       style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0.01%;font-family:'Helvetica Neue LT Com';-inkscape-font-specification:'Helvetica Neue LT Com';text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-anchor:start;display:inline;overflow:visible;visibility:visible;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;enable-background:accumulate"
        transform="translate(-4197.8617,367.29857)"><flowRegion
          id="flowRegion4464-8"><rect
            id="rect4466-24"
@@ -6502,7 +6509,9 @@
            height="200.42303"
            x="-717.69135"
            y="782.737" /></flowRegion><flowPara
-         id="flowPara4468-5" /></flowRoot>    <path
+         id="flowPara4468-5"
+         style="font-size:40px;line-height:0"> </flowPara></flowRoot>
+    <path
        inkscape:connector-curvature="0"
        style="fill:none;stroke:#2d3680;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-opacity:0.50196078;stroke-dasharray:none;stroke-dashoffset:0"
        id="path7319-0-2"
@@ -6510,7 +6519,7 @@
     <flowRoot
        xml:space="preserve"
        id="flowRoot4462-2-9"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Helvetica Neue LT Com;-inkscape-font-specification:Helvetica Neue LT Com"
+       style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0.01%;font-family:'Helvetica Neue LT Com';-inkscape-font-specification:'Helvetica Neue LT Com';text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-anchor:start;display:inline;overflow:visible;visibility:visible;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;enable-background:accumulate"
        transform="translate(-7366.4298,-1060.6061)"><flowRegion
          id="flowRegion4464-2-2"><rect
            id="rect4466-2-7"
@@ -6518,7 +6527,9 @@
            height="200.42303"
            x="-717.69135"
            y="782.737" /></flowRegion><flowPara
-         id="flowPara4468-7-7" /></flowRoot>    <use
+         id="flowPara4468-7-7"
+         style="font-size:40px;line-height:0"> </flowPara></flowRoot>
+    <use
        style="fill:#000000;fill-opacity:1"
        xlink:href="#glyph0-6-75"
        x="343.41406"
@@ -6652,7 +6663,7 @@
     <flowRoot
        xml:space="preserve"
        id="flowRoot4462-26"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Helvetica Neue LT Com;-inkscape-font-specification:Helvetica Neue LT Com"
+       style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0.01%;font-family:'Helvetica Neue LT Com';-inkscape-font-specification:'Helvetica Neue LT Com';text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-anchor:start;display:inline;overflow:visible;visibility:visible;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;enable-background:accumulate"
        transform="translate(-995.7583,-38.0719)"><flowRegion
          id="flowRegion4464-80"><rect
            id="rect4466-0"
@@ -6660,7 +6671,9 @@
            height="200.42303"
            x="-717.69135"
            y="782.737" /></flowRegion><flowPara
-         id="flowPara4468-56" /></flowRoot>    <path
+         id="flowPara4468-56"
+         style="font-size:40px;line-height:0"> </flowPara></flowRoot>
+    <path
        inkscape:connector-curvature="0"
        style="fill:none;stroke:#2d3680;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-opacity:0.50196078;stroke-dasharray:none;stroke-dashoffset:0"
        id="path7319-0-5"
@@ -6668,7 +6681,7 @@
     <flowRoot
        xml:space="preserve"
        id="flowRoot4462-2-99"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Helvetica Neue LT Com;-inkscape-font-specification:Helvetica Neue LT Com"
+       style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0.01%;font-family:'Helvetica Neue LT Com';-inkscape-font-specification:'Helvetica Neue LT Com';text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-anchor:start;display:inline;overflow:visible;visibility:visible;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;enable-background:accumulate"
        transform="translate(-4164.3264,-1465.9766)"><flowRegion
          id="flowRegion4464-2-9"><rect
            id="rect4466-2-5"
@@ -6676,7 +6689,9 @@
            height="200.42303"
            x="-717.69135"
            y="782.737" /></flowRegion><flowPara
-         id="flowPara4468-7-86" /></flowRoot>    <path
+         id="flowPara4468-7-86"
+         style="font-size:40px;line-height:0"> </flowPara></flowRoot>
+    <path
        inkscape:connector-curvature="0"
        style="fill:none;stroke:#2d3680;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-opacity:0.50196078;stroke-dasharray:none;stroke-dashoffset:0"
        id="path7319-8"
@@ -6684,7 +6699,7 @@
     <flowRoot
        xml:space="preserve"
        id="flowRoot4462-4"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Helvetica Neue LT Com;-inkscape-font-specification:Helvetica Neue LT Com"
+       style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0.01%;font-family:'Helvetica Neue LT Com';-inkscape-font-specification:'Helvetica Neue LT Com';text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-anchor:start;display:inline;overflow:visible;visibility:visible;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;enable-background:accumulate"
        transform="translate(655.4544,486.11381)"><flowRegion
          id="flowRegion4464-6"><rect
            id="rect4466-4"
@@ -6692,7 +6707,9 @@
            height="200.42303"
            x="-717.69135"
            y="782.737" /></flowRegion><flowPara
-         id="flowPara4468-72" /></flowRoot>    <path
+         id="flowPara4468-72"
+         style="font-size:40px;line-height:0"> </flowPara></flowRoot>
+    <path
        inkscape:connector-curvature="0"
        style="fill:none;stroke:#2d3680;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-opacity:0.50196078;stroke-dasharray:none;stroke-dashoffset:0"
        id="path7319-0-6"
@@ -6700,7 +6717,7 @@
     <flowRoot
        xml:space="preserve"
        id="flowRoot4462-2-4"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Helvetica Neue LT Com;-inkscape-font-specification:Helvetica Neue LT Com"
+       style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0.01%;font-family:'Helvetica Neue LT Com';-inkscape-font-specification:'Helvetica Neue LT Com';text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-anchor:start;display:inline;overflow:visible;visibility:visible;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;enable-background:accumulate"
        transform="translate(-2513.1137,-941.7909)"><flowRegion
          id="flowRegion4464-2-5"><rect
            id="rect4466-2-7-8"
@@ -6708,31 +6725,35 @@
            height="200.42303"
            x="-717.69135"
            y="782.737" /></flowRegion><flowPara
-         id="flowPara4468-7-8" /></flowRoot>    <flowRoot
+         id="flowPara4468-7-8"
+         style="font-size:40px;line-height:0"> </flowPara></flowRoot>
+    <flowRoot
        xml:space="preserve"
        id="flowRoot46838"
-       style="font-size:40px;font-style:normal;font-weight:normal;line-height:100%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       style="font-style:normal;font-weight:normal;line-height:0.01%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
        transform="translate(-1541.7201,1332.2514)"><flowRegion
-         id="flowRegion46840"><rect
+         id="flowRegion46840"
+         style="font-family:sans-serif"><rect
            id="rect46842"
            width="1254.5414"
            height="368.48193"
            x="1719.3702"
            y="1278.2986" /></flowRegion><flowPara
          id="flowPara46852"
-         style="font-size:48px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Helvetica Neue LT Com;-inkscape-font-specification:Helvetica Neue LT Com" /><flowPara
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:48px;line-height:1;font-family:'Helvetica Neue LT Com';-inkscape-font-specification:'Helvetica Neue LT Com'"> </flowPara><flowPara
          id="flowPara46854"
-         style="font-size:48px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Helvetica Neue LT Com;-inkscape-font-specification:Helvetica Neue LT Com" /><flowPara
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:48px;line-height:1;font-family:'Helvetica Neue LT Com';-inkscape-font-specification:'Helvetica Neue LT Com'"> </flowPara><flowPara
          id="flowPara46856"
-         style="font-size:48px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Helvetica Neue LT Com;-inkscape-font-specification:Helvetica Neue LT Com" /><flowPara
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:48px;line-height:1;font-family:'Helvetica Neue LT Com';-inkscape-font-specification:'Helvetica Neue LT Com'"> </flowPara><flowPara
          id="flowPara46858"
-         style="font-size:48px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Helvetica Neue LT Com;-inkscape-font-specification:Helvetica Neue LT Com" /><flowPara
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:48px;line-height:1;font-family:'Helvetica Neue LT Com';-inkscape-font-specification:'Helvetica Neue LT Com'"> </flowPara><flowPara
          id="flowPara46860"
-         style="font-size:48px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Helvetica Neue LT Com;-inkscape-font-specification:Helvetica Neue LT Com" /><flowPara
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:48px;line-height:1;font-family:'Helvetica Neue LT Com';-inkscape-font-specification:'Helvetica Neue LT Com'"> </flowPara><flowPara
          id="flowPara46862"
-         style="font-size:48px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Helvetica Neue LT Com;-inkscape-font-specification:Helvetica Neue LT Com" /><flowPara
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:48px;line-height:1;font-family:'Helvetica Neue LT Com';-inkscape-font-specification:'Helvetica Neue LT Com'"> </flowPara><flowPara
          id="flowPara46864"
-         style="font-size:48px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Helvetica Neue LT Com;-inkscape-font-specification:Helvetica Neue LT Com" /></flowRoot>    <path
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:48px;line-height:1;font-family:'Helvetica Neue LT Com';-inkscape-font-specification:'Helvetica Neue LT Com'"> </flowPara></flowRoot>
+    <path
        inkscape:connector-curvature="0"
        style="fill:none;stroke:#2d3680;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-opacity:0.50196078;stroke-dasharray:none;stroke-dashoffset:0"
        id="path7319-74"
@@ -6740,7 +6761,7 @@
     <flowRoot
        xml:space="preserve"
        id="flowRoot4462-58"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Helvetica Neue LT Com;-inkscape-font-specification:Helvetica Neue LT Com"
+       style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0.01%;font-family:'Helvetica Neue LT Com';-inkscape-font-specification:'Helvetica Neue LT Com';text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-anchor:start;display:inline;overflow:visible;visibility:visible;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;enable-background:accumulate"
        transform="translate(-2383.5358,-783.45937)"><flowRegion
          id="flowRegion4464-0"><rect
            id="rect4466-7"
@@ -6748,7 +6769,9 @@
            height="200.42303"
            x="-717.69135"
            y="782.737" /></flowRegion><flowPara
-         id="flowPara4468-2" /></flowRoot>    <path
+         id="flowPara4468-2"
+         style="font-size:40px;line-height:0"> </flowPara></flowRoot>
+    <path
        inkscape:connector-curvature="0"
        style="fill:none;stroke:#2d3680;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-opacity:0.50196078;stroke-dasharray:none;stroke-dashoffset:0"
        id="path7319-0-3"
@@ -6756,7 +6779,7 @@
     <flowRoot
        xml:space="preserve"
        id="flowRoot4462-2-5"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Helvetica Neue LT Com;-inkscape-font-specification:Helvetica Neue LT Com"
+       style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0.01%;font-family:'Helvetica Neue LT Com';-inkscape-font-specification:'Helvetica Neue LT Com';text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-anchor:start;display:inline;overflow:visible;visibility:visible;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;enable-background:accumulate"
        transform="translate(-5552.1039,-2211.3641)"><flowRegion
          id="flowRegion4464-2-6"><rect
            id="rect4466-2-8"
@@ -6764,7 +6787,9 @@
            height="200.42303"
            x="-717.69135"
            y="782.737" /></flowRegion><flowPara
-         id="flowPara4468-7-72" /></flowRoot>    <g
+         id="flowPara4468-7-72"
+         style="font-size:40px;line-height:0"> </flowPara></flowRoot>
+    <g
        id="g105010"
        transform="matrix(1.6275957,0,0,-1.6275957,1792.0909,3933.2212)" />
     <g
@@ -7509,14 +7534,16 @@
     <flowRoot
        xml:space="preserve"
        id="flowRoot73097"
-       style="font-size:36px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;text-anchor:start;color:#000000;fill:#f4a460;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Helvetica Neue LT Com;-inkscape-font-specification:Helvetica Neue LT Com"><flowRegion
+       style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0.01%;font-family:'Helvetica Neue LT Com';-inkscape-font-specification:'Helvetica Neue LT Com';text-align:start;text-anchor:start;display:inline;overflow:visible;visibility:visible;fill:#f4a460;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;enable-background:accumulate"><flowRegion
          id="flowRegion73099"><rect
            id="rect73101"
            width="946.58582"
            height="172.56792"
            x="-304.53162"
            y="3581.0891" /></flowRegion><flowPara
-         id="flowPara73103" /></flowRoot>    <g
+         id="flowPara73103"
+         style="font-size:36px;line-height:1.25"> </flowPara></flowRoot>
+    <g
        id="g8080"
        transform="translate(12,0)">
       <path
@@ -7975,93 +8002,87 @@
            sodipodi:type="arc" />
       </g>
     </g>
-    <path
+    <circle
        inkscape:tile-y0="269.99479"
        inkscape:tile-x0="207.08127"
-       transform="matrix(-1.374549,0,0,1.374549,381.58161,3757.9267)"
-       d="m 227.28433,280.09631 c 0,5.57892 -4.52261,10.10153 -10.10153,10.10153 -5.57892,0 -10.10153,-4.52261 -10.10153,-10.10153 0,-5.57891 4.52261,-10.10152 10.10153,-10.10152 5.57892,0 10.10153,4.52261 10.10153,10.10152 z"
-       sodipodi:ry="10.101525"
-       sodipodi:rx="10.101525"
-       sodipodi:cy="280.09631"
-       sodipodi:cx="217.1828"
+       transform="scale(-1,1)"
        id="use2866-0-5-09-6-7-7-3-2"
-       style="color:#000000;fill:#ececec;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.85708117;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:1.71416236, 1.71416236;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       sodipodi:type="arc" />
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:#ececec;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:1.1781;stroke-miterlimit:4;stroke-dasharray:2.3562, 2.3562;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       cx="-86.70845"
+       cy="4143.2378"
+       r="13.885041" />
     <g
        style="display:inline"
        id="g7756-6"
-       transform="matrix(-0.18024518,1.1085113,-1.1085113,-0.18024518,4516.4873,4228.7928)">
+       transform="matrix(-0.18024518,1.1085113,-1.1085113,-0.18024518,4520.1425,4228.9027)">
       <path
          id="path25772-4-9-1-5-0-2"
          d="m 523.16755,3916.3884 7.38168,48.3908"
-         style="fill:none;stroke:#000000;stroke-width:1.04943848px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
+         style="display:inline;fill:none;stroke:#000000;stroke-width:1.04944px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          inkscape:connector-curvature="0" />
-      <path
-         sodipodi:type="arc"
-         style="color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.8574394;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+      <circle
+         style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.857439;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker:none;enable-background:accumulate"
          id="use2866-0-5-3-7-2-4-6-2-6"
-         sodipodi:cx="217.1828"
-         sodipodi:cy="280.09631"
-         sodipodi:rx="10.101525"
-         sodipodi:ry="10.101525"
-         d="m 227.28433,280.09631 c 0,5.57892 -4.52261,10.10153 -10.10153,10.10153 -5.57892,0 -10.10153,-4.52261 -10.10153,-10.10153 0,-5.57891 4.52261,-10.10152 10.10153,-10.10152 5.57892,0 10.10153,4.52261 10.10153,10.10152 z"
          transform="matrix(-1.2239214,0,0,1.2239214,788.92841,3573.6753)"
          inkscape:tile-x0="207.08127"
-         inkscape:tile-y0="269.99479" />
-      <path
-         sodipodi:type="arc"
-         style="color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.8574394;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+         inkscape:tile-y0="269.99479"
+         cx="217.1828"
+         cy="280.09631"
+         r="10.101525" />
+      <circle
+         style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.857439;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker:none;enable-background:accumulate"
          id="use2866-0-5-43-1-2-9-8-3-5"
-         sodipodi:cx="217.1828"
-         sodipodi:cy="280.09631"
-         sodipodi:rx="10.101525"
-         sodipodi:ry="10.101525"
-         d="m 227.28433,280.09631 c 0,5.57892 -4.52261,10.10153 -10.10153,10.10153 -5.57892,0 -10.10153,-4.52261 -10.10153,-10.10153 0,-5.57891 4.52261,-10.10152 10.10153,-10.10152 5.57892,0 10.10153,4.52261 10.10153,10.10152 z"
          transform="matrix(-1.2239214,0,0,1.2239214,797.24131,3621.3145)"
          inkscape:tile-x0="207.08127"
-         inkscape:tile-y0="269.99479" />
+         inkscape:tile-y0="269.99479"
+         cx="217.1828"
+         cy="280.09631"
+         r="10.101525" />
     </g>
     <flowRoot
        xml:space="preserve"
        id="flowRoot2816-4-7-4-6-8-9"
-       style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Liberation Sans;-inkscape-font-specification:Liberation Sans"
-       transform="matrix(0.55965496,0,0,0.55965496,975.7684,3982.9698)"><flowRegion
+       style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0.01%;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-anchor:start;display:inline;overflow:visible;visibility:visible;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;enable-background:accumulate"
+       transform="matrix(0.55965496,0,0,0.55965496,963.7684,3990.9698)"><flowRegion
          id="flowRegion2818-4-1-0-85-5-1"><rect
            id="rect2820-2-5-0-7-6-6"
            width="949.88306"
            height="276.31256"
            x="-1531.4286"
            y="273.71429" /></flowRegion><flowPara
-         style="font-size:32.16267395px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Helvetica Neue LT Com;-inkscape-font-specification:Helvetica Neue LT Com"
-         id="flowPara2822-95-7-5-3-7-30">virtual amplicon (or phantom)</flowPara></flowRoot>    <flowRoot
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:32.1627px;line-height:0;font-family:'Helvetica Neue LT Com';-inkscape-font-specification:'Helvetica Neue LT Com'"
+         id="flowPara2822-95-7-5-3-7-30">virtual amplicon (or phantom)</flowPara></flowRoot>
+    <flowRoot
        xml:space="preserve"
        id="flowRoot2816-4-7-4-6-8-9-8"
-       style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Liberation Sans;-inkscape-font-specification:Liberation Sans"
-       transform="matrix(0.55965496,0,0,0.55965496,977.7684,3940.9698)"><flowRegion
+       style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0.01%;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-anchor:start;display:inline;overflow:visible;visibility:visible;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;enable-background:accumulate"
+       transform="matrix(0.55965496,0,0,0.55965496,965.7684,3950.9698)"><flowRegion
          id="flowRegion2818-4-1-0-85-5-1-4"><rect
            id="rect2820-2-5-0-7-6-6-1"
            width="949.88306"
            height="276.31256"
            x="-1531.4286"
            y="273.71429" /></flowRegion><flowPara
-         style="font-size:32.16267395px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Helvetica Neue LT Com;-inkscape-font-specification:Helvetica Neue LT Com"
-         id="flowPara2822-95-7-5-3-7-30-3">small OTU (made of 2 rare amplicons)</flowPara></flowRoot>    <flowRoot
-       xml:space="preserve"
-       id="flowRoot2816-4-7-4-6-8-9-8-5"
-       style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Liberation Sans;-inkscape-font-specification:Liberation Sans"
-       transform="matrix(0.55965496,0,0,0.55965496,909.27542,3695.511)"><flowRegion
-         id="flowRegion2818-4-1-0-85-5-1-4-3"><rect
-           id="rect2820-2-5-0-7-6-6-1-2"
-           width="401.16016"
-           height="252.89281"
-           x="-1531.4286"
-           y="273.71429" /></flowRegion><flowPara
-         style="font-size:36.45554733px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Helvetica Neue LT Com;-inkscape-font-specification:Helvetica Neue LT Com"
-         id="flowPara2822-95-7-5-3-7-30-3-6">Postulate the existence of an intermediate amplicon to be able to graft a small OTU onto a bigger one.</flowPara></flowRoot>    <path
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:32.1627px;line-height:0;font-family:'Helvetica Neue LT Com';-inkscape-font-specification:'Helvetica Neue LT Com'"
+         id="flowPara2822-95-7-5-3-7-30-3">small cluster (made of 2 rare amplicons)</flowPara></flowRoot>
+    <path
        style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:1, 2;stroke-dashoffset:0;marker-end:url(#Arrow1Lend)"
        d="m 271.79961,3884.9328 c 161.04334,0.3219 158.23342,19.9946 200.69915,68.2224"
        id="path8135"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot2816-4-7-4-6-8-9-8-5-3"
+       style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:263.01%;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-anchor:start;display:inline;overflow:visible;visibility:visible;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;enable-background:accumulate"
+       transform="matrix(0.55965496,0,0,0.55965496,906.568,3702.9743)"><flowRegion
+         id="flowRegion2818-4-1-0-85-5-1-4-3-6"><rect
+           id="rect2820-2-5-0-7-6-6-1-2-7"
+           width="401.16016"
+           height="252.89281"
+           x="-1531.4286"
+           y="273.71429" /></flowRegion><flowPara
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:36.4555px;font-family:'Helvetica Neue LT Com';-inkscape-font-specification:'Helvetica Neue LT Com'"
+         id="flowPara2822-95-7-5-3-7-30-3-6-5">Postulate the existence of an intermediate amplicon to be able to graft a small cluster onto a bigger one</flowPara></flowRoot>
   </g>
 </svg>
